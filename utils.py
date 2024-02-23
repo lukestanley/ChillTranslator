@@ -2,14 +2,13 @@ import json
 from typing import Any, Dict, Union
 import requests
 
-from llama_cpp import (
-    json_schema_to_gbnf,
-)
+from llama_cpp import json_schema_to_gbnf
 
-# Only used directly to convert the JSON schema to GBNF,
+# The llama_cpp Python HTTP server communicates with the AI model, similar 
+# to the OpenAI API but adds a unique "grammar" parameter.
+# The real OpenAI API has other ways to set the output format.
 
-# The main interface is the HTTP server, not the library directly.
-
+URL = "http://localhost:5834/v1/chat/completions"
 
 def llm_streaming(
     prompt: str, pydantic_model_class, return_pydantic_object=False
@@ -27,7 +26,7 @@ def llm_streaming(
         "stream": True,
         "max_tokens": 1000,
         "grammar": grammar,
-        "temperature": 1.0,
+        "temperature": 0.7,
         "messages": [{"role": "user", "content": prompt}],
     }
     headers = {
@@ -35,7 +34,7 @@ def llm_streaming(
     }
 
     response = requests.post(
-        "http://localhost:5834/v1/chat/completions",
+        URL,
         headers=headers,
         json=payload,
         stream=True,
