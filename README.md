@@ -4,7 +4,7 @@
 This is an early experimental tool aimed at reducing online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
 
-ChillTranslator aims to foster healthier online interactions. The potential uses of this translator are vast, and exploring its integration could prove invaluable.
+ChillTranslator aims to help make online interactions more healthy.
 
 Currently, it "translates" a built-in example of a spicy comment.
 
