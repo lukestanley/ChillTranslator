@@ -14,6 +14,8 @@ ChillTranslator hopes to mitigate toxic comments by automatically rephrasing neg
 
 Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and constructive places? I think so!
 
+![ChillTranslator demo](demo.gif)
+
 ## Approach ✨
 
 - **Converts** text to less toxic variations
