@@ -12,16 +12,12 @@ from promptObjects import (
     SpicyScore,
 )
 
-# This script uses the llama_cpp server to improve a text.
-# To run this script, you need to do something like this:
-# Download the model: https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true
-# Rename it as needed.
-# Install the server and start it:
+# This script uses the llama_cpp server to improve a text, it depends on the llama_cpp server being installed and running with a model loaded.
 # pip install llama-cpp-python[server] --upgrade
 # python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf  --port 5834 --n_ctx 4096 --use_mlock false
 # Run this script:
 # python3 chill.py
-# This will then try and improve the original text below:
+# This should then try and improve the original text below:
 
 original_text = """Stop chasing dreams instead. Life is not a Hollywood movie. Not everyone is going to get a famous billionaire. Adjust your expectations to reality, and stop thinking so highly of yourself, stop judging others. Assume the responsibility for the things that happen in your life. It is kind of annoying to read your text, it is always some external thing that "happened" to you, and it is always other people who are not up to your standards. At some moment you even declare with despair. And guess what? This is true and false at the same time, in a fundamental level most people are not remarkable, and you probably aren't too. But at the same time, nobody is the same, you have worth just by being, and other people have too. The impression I get is that you must be someone incredibly annoying to work with, and that your performance is not even nearly close to what you think it is, and that you really need to come down to earth. Stop looking outside, work on yourself instead. You'll never be satisfied just by changing jobs. Do therapy if you wish, become acquainted with stoicism, be a volunteer in some poor country, whatever, but do something to regain control of your life, to get some perspective, and to adjust your expectations to reality."""
 # From elzbardico on https://news.ycombinator.com/item?id=36119858
@@ -133,8 +129,7 @@ for iteration in range(1, max_iterations + 1):
         print("ValueError:", e)
         continue
 
-# TODO: Segment the text into sentences for parallel processing,
-# and isolate the most problematic parts for improvement
+# TODO: Segment the text into sentences for parallel processing, and isolate the most problematic parts for improvement
 """
 # import pysbd
 # sentences = pysbd.Segmenter(language="en", clean=False).segment(paragraph)
