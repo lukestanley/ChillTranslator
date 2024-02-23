@@ -1,4 +1,4 @@
-# ChillTranslator 🗣️🌶️➡️❄️💬😎
+# ❄️ ChillTranslator 🤬 ➡️ 😎💬
 
 
 This is an early experimental tool aimed at reducing online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
