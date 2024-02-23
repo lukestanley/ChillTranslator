@@ -1,3 +1,5 @@
+from pydantic import BaseModel, Field
+
 improve_prompt = """
 Your task is to rephrase inflammatory text, so it is more calm and constructive, without changing the intended meaning.
 The improved text should have a softened tone, avoiding judgemental and extreme words.
@@ -90,3 +92,21 @@ Output your response as valid JSON in this format, then stop:
 }
 Please score the text.
 """
+
+
+class ImprovedText(BaseModel):
+    text: str = Field(str, description="The improved text.")
+
+
+class SpicyScore(BaseModel):
+    spicy_score: float = Field(float, description="The spiciness score of the text.")
+
+
+class Critique(BaseModel):
+    critique: str = Field(str, description="The critique of the text.")
+
+
+class FaithfulnessScore(BaseModel):
+    faithfulness_score: float = Field(
+        float, description="The faithfulness score of the text."
+    )

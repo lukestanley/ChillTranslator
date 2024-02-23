@@ -4,7 +4,9 @@ import requests
 
 from llama_cpp import (
     json_schema_to_gbnf,
-)  # Only used directly to convert the JSON schema to GBNF,
+)
+
+# Only used directly to convert the JSON schema to GBNF,
 
 # The main interface is the HTTP server, not the library directly.
 
@@ -71,3 +73,9 @@ def query_ai_prompt(prompt, replacements, model_class):
     # print('prompt')
     # print(prompt)
     return llm_streaming(prompt, model_class)
+
+
+def calculate_overall_score(faithfulness, spiciness):
+    baseline_weight = 0.8
+    overall = faithfulness + (1 - baseline_weight) * spiciness * faithfulness
+    return overall

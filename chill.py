@@ -1,12 +1,15 @@
 import json
 import time
-from pydantic import BaseModel, Field
-from utils import query_ai_prompt
-from prompts import (
+from utils import calculate_overall_score, query_ai_prompt
+from promptObjects import (
     improve_prompt,
     critique_prompt,
     faith_scorer_prompt,
     spicy_scorer_prompt,
+    ImprovedText,
+    Critique,
+    FaithfulnessScore,
+    SpicyScore,
 )
 
 # This script uses the llama_cpp server to improve a text.
@@ -23,35 +26,22 @@ from prompts import (
 original_text = """Stop chasing dreams instead. Life is not a Hollywood movie. Not everyone is going to get a famous billionaire. Adjust your expectations to reality, and stop thinking so highly of yourself, stop judging others. Assume the responsibility for the things that happen in your life. It is kind of annoying to read your text, it is always some external thing that "happened" to you, and it is always other people who are not up to your standards. At some moment you even declare with despair. And guess what? This is true and false at the same time, in a fundamental level most people are not remarkable, and you probably aren't too. But at the same time, nobody is the same, you have worth just by being, and other people have too. The impression I get is that you must be someone incredibly annoying to work with, and that your performance is not even nearly close to what you think it is, and that you really need to come down to earth. Stop looking outside, work on yourself instead. You'll never be satisfied just by changing jobs. Do therapy if you wish, become acquainted with stoicism, be a volunteer in some poor country, whatever, but do something to regain control of your life, to get some perspective, and to adjust your expectations to reality."""
 # From elzbardico on https://news.ycombinator.com/item?id=36119858
 
-# TODO: See README.md for the more plans.
-# TODO: Segment the text into sentences
 """
-import pysbd
-sentences = pysbd.Segmenter(language="en", clean=False).segment(paragraph)
+Outputs something like this:
+ {
+    "critique": "The revised text effectively conveys the same message as the original but in a more constructive and diplomatic tone, maintaining the original's intention while promoting a more positive discussion.",
+    "faithfulness_score": 0.85,
+    "spicy_score": 0.25,
+    "overall_score": 0.89,
+    "edit": "Consider shifting your focus from chasing dreams to finding fulfillment in reality. Life isn't a Hollywood movie, and becoming a famous billionaire isn't a realistic goal for everyone. It might be helpful to recalibrate your expectations to better align with what's possible. Instead of judging others, try to understand them better. Take responsibility for the events in your life, rather than attributing them to external factors or other people. I understand that it can be frustrating when things don't go as planned, but keep in mind that most people, including yourself, are not inherently exceptional or unremarkable. However, everyone has unique worth that doesn't depend on their achievements or status. It's essential to recognize that you may come across as demanding to work with and that your self-perception might not match others' opinions of your performance. To gain a fresh perspective and adjust your expectations, you could explore personal growth opportunities such as therapy, practicing stoicism, volunteering in underserved communities, or any other activity that helps you develop self-awareness and emotional intelligence."
+}
 """
 
 global suggestions
 suggestions = []
 
 start_time = time.time()
-
-
-class ImprovedText(BaseModel):
-    text: str = Field(str, description="The improved text.")
-
-
-class SpicyScore(BaseModel):
-    spicy_score: float = Field(float, description="The spiciness score of the text.")
-
-
-class Critique(BaseModel):
-    critique: str = Field(str, description="The critique of the text.")
-
-
-class FaithfulnessScore(BaseModel):
-    faithfulness_score: float = Field(
-        float, description="The faithfulness score of the text."
-    )
+max_iterations = 20
 
 
 def improve_text():
@@ -84,12 +74,6 @@ def critique_text(last_edit):
     }
 
     return combined_resp
-
-
-def calculate_overall_score(faithfulness, spiciness):
-    baseline_weight = 0.8
-    overall = faithfulness + (1 - baseline_weight) * spiciness * faithfulness
-    return overall
 
 
 def should_stop(
@@ -129,9 +113,6 @@ def print_iteration_result(iteration, overall_score, time_used):
     print(json.dumps(suggestions, indent=2))
 
 
-max_iterations = 20
-
-
 for iteration in range(1, max_iterations + 1):
     try:
         if iteration % 2 == 1:
@@ -153,13 +134,8 @@ for iteration in range(1, max_iterations + 1):
         print("ValueError:", e)
         continue
 
+# TODO: Segment the text into sentences
 """
-Outputs something like this:
- {
-    "critique": "The revised text effectively conveys the same message as the original but in a more constructive and diplomatic tone, maintaining the original's intention while promoting a more positive discussion.",
-    "faithfulness_score": 0.85,
-    "spicy_score": 0.25,
-    "overall_score": 0.89,
-    "edit": "Consider shifting your focus from chasing dreams to finding fulfillment in reality. Life isn't a Hollywood movie, and becoming a famous billionaire isn't a realistic goal for everyone. It might be helpful to recalibrate your expectations to better align with what's possible. Instead of judging others, try to understand them better. Take responsibility for the events in your life, rather than attributing them to external factors or other people. I understand that it can be frustrating when things don't go as planned, but keep in mind that most people, including yourself, are not inherently exceptional or unremarkable. However, everyone has unique worth that doesn't depend on their achievements or status. It's essential to recognize that you may come across as demanding to work with and that your self-perception might not match others' opinions of your performance. To gain a fresh perspective and adjust your expectations, you could explore personal growth opportunities such as therapy, practicing stoicism, volunteering in underserved communities, or any other activity that helps you develop self-awareness and emotional intelligence."
-}
+import pysbd
+sentences = pysbd.Segmenter(language="en", clean=False).segment(paragraph)
 """
