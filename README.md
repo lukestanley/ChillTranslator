@@ -48,6 +48,13 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
   ```
   These config options are not going to be optimal for a lot of setups, as it may not use GPU right away, but this can be configured with a different argument. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
 
+5. Get the code up:
+  ```
+  git clone https://github.com/lukestanley/ChillTranslator.git
+  
+  cd ChillTranslator
+  ```
+
 ### Usage
 
 ChillTranslator currently has an example spicy comment it works on fixing right away.
