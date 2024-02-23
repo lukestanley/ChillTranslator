@@ -8,11 +8,12 @@ from llama_cpp import json_schema_to_gbnf  # Only used directly to convert the J
 
 def llm_streaming(prompt:str, pydantic_model_class, return_pydantic_object=False) -> Union[str, Dict[str, Any]]:
     schema = pydantic_model_class.model_json_schema()
+    
+    # Optional example field from schema, is not needed for the grammar generation
     if "example" in schema:
         del schema["example"]
+    
     json_schema = json.dumps(schema)
-    #example = Actor.model_config['json_schema_extra']['example']
-    #grammar = llama_cpp.LlamaGrammar.from_json_schema(json_schema,verbose=False)
     grammar = json_schema_to_gbnf(json_schema)
 
     payload = {
