@@ -38,31 +38,36 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
 
 ### Installation
 
-1. Download a compatible and capable model like: [Mixtral-8x7B-Instruct-v0.1-GGUF](https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true)
-2. Make sure it's named as expected by the next command.
-3. Install dependencies:
-  ```
-  pip install requests pydantic llama-cpp-python llama-cpp-python[server] --upgrade
-  ```
-4. Start the LLM server:
-  ```
-  python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf  --port 5834 --n_ctx 4096 --use_mlock false
-  ```
-  These config options are not going to be optimal for a lot of setups, as it may not use GPU right away, but this can be configured with a different argument. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
+1. Clone the Project Repository:
+   ```
+   git clone https://github.com/lukestanley/ChillTranslator.git
+   cd ChillTranslator
+   ```
+2. Download a compatible and capable model like: [Mixtral-8x7B-Instruct-v0.1-GGUF](https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true). E.g:
+   ```
+   wget https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true -O mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf &
+   ```
+3. Install dependencies, including a special fork of `llama-cpp-python`, and Nvidia GPU support if needed:
+   ```
+   pip install requests pydantic uvicorn starlette fastapi sse_starlette starlette_context pydantic_settings
 
-5. Get the code up:
-  ```
-  git clone https://github.com/lukestanley/ChillTranslator.git
-  
-  cd ChillTranslator
-  ```
+   # If you have an Nvidia GPU, install the special fork of llama-cpp-python with CUBLAS support:
+   CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install git+https://github.com/lukestanley/llama-cpp-python.git@expose_json_grammar_convert_function
+   ```
+   If you don't have an Nvidia GPU, the `CMAKE_ARGS="-DLLAMA_CUBLAS=on"` is not needed before the `pip install` command.
+   
+4. Start the LLM server with your chosen configuration. Example for Nvidia with `--n_gpu_layers` set to 20; different GPUs fit more or less layers. If you have no GPU, you don't need the `--n_gpu_layers` flag:
+   ```
+   python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf --port 5834 --n_ctx 4096 --use_mlock false --n_gpu_layers 20 &
+   ```
+These config options may need tweaking. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
+
 
 ### Usage
 
-ChillTranslator currently has an example spicy comment it works on fixing right away.
-This is how to see it in action:
+ChillTranslator currently has an example spicy comment it works on fixing right away. This is how to see it in action:
 ```python
-  python3 chill.py
+python3 chill.py
 ```
 
 ## Contributing 🤝
