@@ -29,17 +29,24 @@ suggestions = []
 
 start_time = time.time()
 
+
 class ImprovedText(BaseModel):
     text: str = Field(str, description="The improved text.")
+
 
 class SpicyScore(BaseModel):
     spicy_score: float = Field(float, description="The spiciness score of the text.")
 
+
 class Critique(BaseModel):
     critique: str = Field(str, description="The critique of the text.")
 
+
 class FaithfulnessScore(BaseModel):
-    faithfulness_score: float = Field(float, description="The faithfulness score of the text.")
+    faithfulness_score: float = Field(
+        float, description="The faithfulness score of the text."
+    )
+
 
 improve_prompt = """
 Your task is to rephrase inflammatory text, so it is more calm and constructive, without changing the intended meaning.
@@ -135,7 +142,6 @@ Please score the text.
 """
 
 
-
 def improve_text():
     global suggestions
     replacements = {
@@ -143,7 +149,7 @@ def improve_text():
         "previous_suggestions": json.dumps(suggestions, indent=2),
     }
     resp_json = query_ai_prompt(improve_prompt, replacements, ImprovedText)
-    #print('resp_json', resp_json)
+    # print('resp_json', resp_json)
     return resp_json["text"]
 
 
@@ -152,15 +158,11 @@ def critique_text(last_edit):
 
     # Query the AI for each of the new prompts separately
 
-    critique_resp = query_ai_prompt(
-        critique_prompt, replacements, Critique 
-    )
+    critique_resp = query_ai_prompt(critique_prompt, replacements, Critique)
     faithfulness_resp = query_ai_prompt(
         faith_scorer_prompt, replacements, FaithfulnessScore
     )
-    spiciness_resp = query_ai_prompt(
-        spicy_scorer_prompt, replacements, SpicyScore
-    )
+    spiciness_resp = query_ai_prompt(spicy_scorer_prompt, replacements, SpicyScore)
 
     # Combine the results from the three queries into a single dictionary
     combined_resp = {
