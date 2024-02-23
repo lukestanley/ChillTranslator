@@ -1,3 +1,10 @@
+import json
+import time
+from pydantic import BaseModel, Field
+from utils import query_ai_prompt
+
+# This script uses the llama_cpp server to improve a text.
+# To run this script, you need to do something like this:
 # Download the model: https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true
 # Rename it as needed.
 # Install the server and start it:
@@ -10,68 +17,12 @@
 original_text = """Stop chasing dreams instead. Life is not a Hollywood movie. Not everyone is going to get a famous billionaire. Adjust your expectations to reality, and stop thinking so highly of yourself, stop judging others. Assume the responsibility for the things that happen in your life. It is kind of annoying to read your text, it is always some external thing that "happened" to you, and it is always other people who are not up to your standards. At some moment you even declare with despair. And guess what? This is true and false at the same time, in a fundamental level most people are not remarkable, and you probably aren't too. But at the same time, nobody is the same, you have worth just by being, and other people have too. The impression I get is that you must be someone incredibly annoying to work with, and that your performance is not even nearly close to what you think it is, and that you really need to come down to earth. Stop looking outside, work on yourself instead. You'll never be satisfied just by changing jobs. Do therapy if you wish, become acquainted with stoicism, be a volunteer in some poor country, whatever, but do something to regain control of your life, to get some perspective, and to adjust your expectations to reality."""
 # From elzbardico on https://news.ycombinator.com/item?id=36119858
 
-import json
-import time
-from typing import Dict, Any, Union
-from pydantic import BaseModel, Field
-import requests
-from llama_cpp import json_schema_to_gbnf # Only used directly to convert the JSON schema to GBNF,
-# The main interface is the HTTP server, not the library directly.
-
+# TODO: See README.md for the more plans.
+# TODO: Segment the text into sentences
 """
 import pysbd
 sentences = pysbd.Segmenter(language="en", clean=False).segment(paragraph)
 """
-
-def llm_streaming(prompt:str, pydantic_model_class, return_pydantic_object=False) -> Union[str, Dict[str, Any]]:
-    schema = pydantic_model_class.model_json_schema()
-    if "example" in schema:
-        del schema["example"]
-    json_schema = json.dumps(schema)
-    #example = Actor.model_config['json_schema_extra']['example']
-    #grammar = llama_cpp.LlamaGrammar.from_json_schema(json_schema,verbose=False)
-    grammar = json_schema_to_gbnf(json_schema)
-    
-    payload = {
-        "stream": True,
-        "max_tokens": 1000,
-        "grammar": grammar,
-        "temperature": 1.0,
-        "messages": [
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ], 
-    }
-    headers = {
-        "Content-Type": "application/json",
-    }
-
-    response = requests.post("http://localhost:5834/v1/chat/completions"
-                             , headers=headers, json=payload, stream=True)
-    output_text = ""
-    for chunk in response.iter_lines():
-        if chunk:
-            chunk = chunk.decode("utf-8")
-            if chunk.startswith("data: "):
-                chunk = chunk.split("data: ")[1]
-                if chunk.strip() == "[DONE]":
-                    break
-                chunk = json.loads(chunk)
-                new_token = chunk.get('choices')[0].get('delta').get('content')
-                if new_token:
-                    output_text = output_text + new_token
-                    print(new_token,sep='',end='',flush=True)
-            #else:
-            #    raise Exception(f"Parse error, expecting stream:{str(chunk)}")
-    
-    if return_pydantic_object:
-        model_object = pydantic_model_class.model_validate_json(output_text)
-        return model_object
-    else:
-        json_output = json.loads(output_text)
-        return json_output
 
 global suggestions
 suggestions = []
@@ -184,21 +135,6 @@ Please score the text.
 """
 
 
-def replace_text(template: str, replacements: dict) -> str:
-    for key, value in replacements.items():
-        template = template.replace(f"{{{key}}}", value)
-    return template
-
-def query_ai_prompt(prompt, replacements, model_class):
-    prompt = replace_text(prompt, replacements)
-    #print('prompt')
-    #print(prompt)
-    return llm_streaming(prompt, model_class)
-
-
-def generate_gbnf_grammar(models):
-    model = models[0]
-    return json_schema_to_gbnf(json.dumps(model.schema()))
 
 def improve_text():
     global suggestions
