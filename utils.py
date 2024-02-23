@@ -47,8 +47,6 @@ def llm_streaming(prompt:str, pydantic_model_class, return_pydantic_object=False
                 if new_token:
                     output_text = output_text + new_token
                     print(new_token,sep='',end='',flush=True)
-            #else:
-            #    raise Exception(f"Parse error, expecting stream:{str(chunk)}")
 
     if return_pydantic_object:
         model_object = pydantic_model_class.model_validate_json(output_text)
