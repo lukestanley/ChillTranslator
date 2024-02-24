@@ -6,7 +6,7 @@ This is an early experimental tool aimed at reducing online toxicity by automati
 
 ChillTranslator aims to help make online interactions more healthy.
 
-Currently, it "translates" a built-in example of a spicy comment.
+Currently, it "translates" a built-in example of a spicy comment, and it can be used via the command line to improve a specific text of your choice, or it can be imported as a module.
 
 Online toxicity can undermine the quality of discourse, causing distress 😞 and driving people away from online communities. Or worse: it can create a viral toxic loop 🌀!
 
@@ -69,6 +69,13 @@ ChillTranslator currently has an example spicy comment it works on fixing right 
 ```python
 python3 chill.py
 ```
+
+For improving a specific text of your choice, use the `-t` flag followed by your text enclosed in quotes:
+```bash
+python3 chill.py -t "Your text goes here"
+```
+
+Or chill can be imported as a module, with the improvement_loop function provided the text to improve.
 
 ## Contributing 🤝
 
