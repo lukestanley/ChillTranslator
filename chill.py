@@ -38,7 +38,7 @@ Outputs something like this:
 
 global suggestions
 suggestions = []
-
+last_edit = ""
 start_time = time.time()
 max_iterations = 20
 
@@ -113,7 +113,9 @@ def print_iteration_result(iteration, overall_score, time_used):
 
 def improvement_loop(input_text):
     global original_text
+    global last_edit
     original_text = input_text
+
     for iteration in range(1, max_iterations + 1):
         try:
             if iteration % 2 == 1:
