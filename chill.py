@@ -1,3 +1,4 @@
+import argparse
 import json
 import time
 from utils import calculate_overall_score, query_ai_prompt
@@ -17,7 +18,9 @@ from promptObjects import (
 # python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf  --port 5834 --n_ctx 4096 --use_mlock false
 # Run this script:
 # python3 chill.py
-# This should then try and improve the original text below:
+# This should then try and improve the original text below.
+# Or you could import the improvement_loop function with a string as an argument to improve a specific text,
+# or use it as a command line tool with the -t flag to improve a specific text.
 
 original_text = """Stop chasing dreams instead. Life is not a Hollywood movie. Not everyone is going to get a famous billionaire. Adjust your expectations to reality, and stop thinking so highly of yourself, stop judging others. Assume the responsibility for the things that happen in your life. It is kind of annoying to read your text, it is always some external thing that "happened" to you, and it is always other people who are not up to your standards. At some moment you even declare with despair. And guess what? This is true and false at the same time, in a fundamental level most people are not remarkable, and you probably aren't too. But at the same time, nobody is the same, you have worth just by being, and other people have too. The impression I get is that you must be someone incredibly annoying to work with, and that your performance is not even nearly close to what you think it is, and that you really need to come down to earth. Stop looking outside, work on yourself instead. You'll never be satisfied just by changing jobs. Do therapy if you wish, become acquainted with stoicism, be a volunteer in some poor country, whatever, but do something to regain control of your life, to get some perspective, and to adjust your expectations to reality."""
 # From elzbardico on https://news.ycombinator.com/item?id=36119858
@@ -40,7 +43,7 @@ start_time = time.time()
 max_iterations = 20
 
 
-def improve_text():
+def improve_text_attempt():
     global suggestions
     replacements = {
         "original_text": json.dumps(original_text),
@@ -108,26 +111,41 @@ def print_iteration_result(iteration, overall_score, time_used):
     print(json.dumps(suggestions, indent=2))
 
 
-for iteration in range(1, max_iterations + 1):
-    try:
-        if iteration % 2 == 1:
-            last_edit = improve_text()
-        else:
-            critique_dict = critique_text(last_edit)
-            update_suggestions(critique_dict)
-            overall_score = critique_dict["overall_score"]
-            time_used = time.time() - start_time
+def improvement_loop(input_text):
+    global original_text
+    original_text = input_text
+    for iteration in range(1, max_iterations + 1):
+        try:
+            if iteration % 2 == 1:
+                last_edit = improve_text_attempt()
+            else:
+                critique_dict = critique_text(last_edit)
+                update_suggestions(critique_dict)
+                overall_score = critique_dict["overall_score"]
+                time_used = time.time() - start_time
 
-            print_iteration_result(iteration, overall_score, time_used)
+                print_iteration_result(iteration, overall_score, time_used)
 
-            if should_stop(iteration, overall_score, time_used):
-                print(
-                    "Stopping\nTop suggestion:\n", json.dumps(suggestions[0], indent=4)
-                )
-                break
-    except ValueError as e:
-        print("ValueError:", e)
-        continue
+                if should_stop(iteration, overall_score, time_used):
+                    print(
+                        "Stopping\nTop suggestion:\n",
+                        json.dumps(suggestions[0], indent=4),
+                    )
+                    break
+        except ValueError as e:
+            print("ValueError:", e)
+            continue
+
+    return suggestions[0]
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process and improve text.")
+    parser.add_argument("-t", "--text", type=str, help="Text to be improved", default=original_text)
+    args = parser.parse_args()
+
+    improvement_loop(args.text)
+
 
 # TODO: Segment the text into sentences for parallel processing, and isolate the most problematic parts for improvement
 """
