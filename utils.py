@@ -7,6 +7,7 @@ from llama_cpp import json_schema_to_gbnf
 # The llama_cpp Python HTTP server communicates with the AI model, similar 
 # to the OpenAI API but adds a unique "grammar" parameter.
 # The real OpenAI API has other ways to set the output format.
+# It's possible to switch to another LLM API by changing the llm_streaming function.
 
 URL = "http://localhost:5834/v1/chat/completions"
 
