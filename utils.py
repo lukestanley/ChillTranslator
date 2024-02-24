@@ -52,6 +52,7 @@ def llm_streaming(
                 if new_token:
                     output_text = output_text + new_token
                     print(new_token, sep="", end="", flush=True)
+    print('\n')
 
     if return_pydantic_object:
         model_object = pydantic_model_class.model_validate_json(output_text)
@@ -69,8 +70,6 @@ def replace_text(template: str, replacements: dict) -> str:
 
 def query_ai_prompt(prompt, replacements, model_class):
     prompt = replace_text(prompt, replacements)
-    # print('prompt')
-    # print(prompt)
     return llm_streaming(prompt, model_class)
 
 
