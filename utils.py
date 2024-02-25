@@ -23,7 +23,7 @@ in_memory_llm = None
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
 
-if len(LLM_MODEL_PATH) > 0:
+if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
     print(f"Using local model from {LLM_MODEL_PATH}")
 else:
     print("No local LLM_MODEL_PATH environment variable set. We need a model, downloading model from HuggingFace Hub")
