@@ -1,9 +1,16 @@
 import json
+from os import environ as env
 from typing import Any, Dict, Union
 import requests
 
+from huggingface_hub import hf_hub_download  
 from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 
+# There are two ways to use the LLM model currently used:
+# 1. Use the HTTP server (USE_HTTP_SERVER=True), this is good for development
+# when you want to change the logic of the translator without restarting the server.
+# 2. Load the model into memory
+# When using the HTTP server, it must be ran separately. See the README for instructions.
 # The llama_cpp Python HTTP server communicates with the AI model, similar 
 # to the OpenAI API but adds a unique "grammar" parameter.
 # The real OpenAI API has other ways to set the output format.
@@ -11,8 +18,24 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
-IN_MEMORY_LLM_PATH = "/fast/mistral-7b-instruct-v0.1.Q4_K_M.gguf"
-# TODO: Have a good way to set the model path
+
+
+LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
+USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
+
+if len(LLM_MODEL_PATH) > 0:
+    print(f"Using local model from {LLM_MODEL_PATH}")
+else:
+    print("No local LLM_MODEL_PATH environment variable set. We need a model, downloading model from HuggingFace Hub")
+    LLM_MODEL_PATH =hf_hub_download(
+        repo_id=env.get("REPO_ID", "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"),
+        filename=env.get("MODEL_FILE", "mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf"),
+    )
+    print(f"Model downloaded to {LLM_MODEL_PATH}")
+
+if in_memory_llm is None and USE_HTTP_SERVER is False:
+    print("Loading model into memory. If you didn't want this, set the USE_HTTP_SERVER environment variable to 'true'.")
+    in_memory_llm = Llama(model_path=LLM_MODEL_PATH)
 
 def llm_streaming(
     prompt: str, pydantic_model_class, return_pydantic_object=False
@@ -83,9 +106,6 @@ def calculate_overall_score(faithfulness, spiciness):
 def llm_stream_sans_network(
     prompt: str, pydantic_model_class, return_pydantic_object=False
 ) -> Union[str, Dict[str, Any]]:
-    global in_memory_llm
-    if in_memory_llm is None:
-        in_memory_llm = Llama(model_path=IN_MEMORY_LLM_PATH)
     schema = pydantic_model_class.model_json_schema()
 
     # Optional example field from schema, is not needed for the grammar generation
@@ -97,6 +117,7 @@ def llm_stream_sans_network(
 
     stream = in_memory_llm(
         prompt,
+        n_ctx=4096,
         max_tokens=1000,
         temperature=0.7,
         grammar=grammar,
