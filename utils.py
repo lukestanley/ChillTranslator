@@ -35,7 +35,7 @@ else:
 
 if in_memory_llm is None and USE_HTTP_SERVER is False:
     print("Loading model into memory. If you didn't want this, set the USE_HTTP_SERVER environment variable to 'true'.")
-    in_memory_llm = Llama(model_path=LLM_MODEL_PATH, n_ctx=4096)
+    in_memory_llm = Llama(model_path=LLM_MODEL_PATH, n_ctx=4096, n_gpu_layers=20)
 
 def llm_streaming(
     prompt: str, pydantic_model_class, return_pydantic_object=False
