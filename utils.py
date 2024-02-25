@@ -95,14 +95,21 @@ def llm_stream_sans_network(
     json_schema = json.dumps(schema)
     grammar = LlamaGrammar.from_json_schema(json_schema)
 
-    output_text = in_memory_llm(
+    stream = in_memory_llm(
         prompt,
         max_tokens=1000,
         temperature=0.7,
         grammar=grammar,
-    )["choices"][0]["text"]
+        stream=True
+    )
 
-    print(output_text)
+    output_text = ""
+    for chunk in stream:
+        result = chunk["choices"][0]
+        print(result["text"], end='', flush=True)
+        output_text = output_text + result["text"]
+
+    print('\n')
 
     if return_pydantic_object:
         model_object = pydantic_model_class.model_validate_json(output_text)
