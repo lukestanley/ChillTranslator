@@ -23,7 +23,8 @@ There could be all kinds of failure cases, but it's a start!
 
 Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and constructive places? I think so!
 
-![ChillTranslator demo](demo.gif)
+![ChillTranslator demo](https://github.com/lukestanley/ChillTranslator/assets/306671/128611f4-3e8e-4c52-ba20-2ae61d727d52)
+
 
 ## Approach ✨
 
