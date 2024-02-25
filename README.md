@@ -1,11 +1,9 @@
 ---
-title: {{title}}
-emoji: {{emoji}}
-colorFrom: {{colorFrom}}
-colorTo: {{colorTo}}
-sdk: {{sdk}}
-sdk_version: {{sdkVersion}}
-app_file: app.py
+title: ChillTranslator
+emoji: ❄️
+colorFrom: red
+colorTo: pink
+sdk: docker
 pinned: false
 ---
 # ❄️ ChillTranslator 🤬 ➡️ 😎💬
