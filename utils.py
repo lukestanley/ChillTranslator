@@ -19,9 +19,12 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
 
-
+N_GPU_LAYERS = env.get("N_GPU_LAYERS", 10)
+CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 4096))
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
+MAX_TOKENS = int(env.get("MAX_TOKENS", 1000))
+TEMPERATURE = float(env.get("TEMPERATURE", 0.7))
 
 if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
     print(f"Using local model from {LLM_MODEL_PATH}")
@@ -35,7 +38,7 @@ else:
 
 if in_memory_llm is None and USE_HTTP_SERVER is False:
     print("Loading model into memory. If you didn't want this, set the USE_HTTP_SERVER environment variable to 'true'.")
-    in_memory_llm = Llama(model_path=LLM_MODEL_PATH, n_ctx=4096, n_gpu_layers=20)
+    in_memory_llm = Llama(model_path=LLM_MODEL_PATH, n_ctx=CONTEXT_SIZE, n_gpu_layers=N_GPU_LAYERS, verbose=True)
 
 def llm_streaming(
     prompt: str, pydantic_model_class, return_pydantic_object=False
@@ -51,9 +54,9 @@ def llm_streaming(
 
     payload = {
         "stream": True,
-        "max_tokens": 1000,
+        "max_tokens": MAX_TOKENS,
         "grammar": grammar,
-        "temperature": 0.7,
+        "temperature": TEMPERATURE,
         "messages": [{"role": "user", "content": prompt}],
     }
     headers = {
@@ -117,8 +120,8 @@ def llm_stream_sans_network(
 
     stream = in_memory_llm(
         prompt,
-        max_tokens=1000,
-        temperature=0.7,
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
         grammar=grammar,
         stream=True
     )
