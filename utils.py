@@ -19,12 +19,12 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
 
-N_GPU_LAYERS = env.get("N_GPU_LAYERS", 10)
+N_GPU_LAYERS = env.get("N_GPU_LAYERS", -1) # Default to -1, which means use all layers if available
 CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 4096))
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
 MAX_TOKENS = int(env.get("MAX_TOKENS", 1000))
-TEMPERATURE = float(env.get("TEMPERATURE", 0.7))
+TEMPERATURE = float(env.get("TEMPERATURE", 0.3))
 
 if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
     print(f"Using local model from {LLM_MODEL_PATH}")
