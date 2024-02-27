@@ -19,7 +19,7 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
 
-N_GPU_LAYERS = env.get("N_GPU_LAYERS", -1) # Default to -1, which means use all layers if available
+N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", 20)) # Default to -1, which means use all layers if available
 CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 4096))
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
@@ -147,3 +147,27 @@ def query_ai_prompt(prompt, replacements, model_class, in_memory=True):
         return llm_stream_sans_network(prompt, model_class)
     else:
         return llm_streaming(prompt, model_class)
+
+
+def llm_stream_sans_network_simple(
+    prompt: str, json_schema:str
+):
+    grammar = LlamaGrammar.from_json_schema(json_schema)
+
+    stream = in_memory_llm(
+        prompt,
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        grammar=grammar,
+        stream=True
+    )
+
+    output_text = ""
+    for chunk in stream:
+        result = chunk["choices"][0]
+        print(result["text"], end='', flush=True)
+        output_text = output_text + result["text"]
+        #yield result["text"]
+
+    print('\n')
+    return output_text
