@@ -10,6 +10,15 @@ ENV HF_HOME="/runpod-volume/.cache/huggingface/"
 RUN python3.11 -m pip install --upgrade pip && \
     python3.11 -m pip install runpod==1.6.0
 
+RUN python3.11 -m pip install pytest cmake \
+    scikit-build setuptools pydantic-settings \
+    huggingface_hub hf_transfer \
+    pydantic pydantic_settings \
+    llama-cpp-python
+    
+# Install llama-cpp-python (build with cuda)
+ENV CMAKE_ARGS="-DLLAMA_CUBLAS=on"
+RUN python3.11 -m pip install llama-cpp-python --upgrade --no-cache-dir --force-reinstall
 ADD runpod_handler.py .
 
 CMD python3.11 -u /runpod_handler.py
