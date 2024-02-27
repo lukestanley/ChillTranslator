@@ -15,10 +15,14 @@ RUN python3.11 -m pip install pytest cmake \
     huggingface_hub hf_transfer \
     pydantic pydantic_settings \
     llama-cpp-python
-    
+
 # Install llama-cpp-python (build with cuda)
 ENV CMAKE_ARGS="-DLLAMA_CUBLAS=on"
-RUN python3.11 -m pip install llama-cpp-python --upgrade --no-cache-dir --force-reinstall
+RUN python3.11 -m pip install git+https://github.com/lukestanley/llama-cpp-python.git@expose_json_grammar_convert_function --upgrade --no-cache-dir --force-reinstall
 ADD runpod_handler.py .
 
-CMD python3.11 -u /runpod_handler.py
+ADD chill.py .
+ADD utils.py .
+ADD promptObjects.py .
+
+CMD nvidia-smi; python3.11 -u /runpod_handler.py

@@ -19,7 +19,7 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
 
-N_GPU_LAYERS = env.get("N_GPU_LAYERS", -1) # Default to -1, which means use all layers if available
+N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", 20)) # Default to -1, which means use all layers if available
 CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 4096))
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
