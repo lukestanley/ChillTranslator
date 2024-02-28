@@ -37,8 +37,7 @@ You can try out the ChillTranslator directly in your browser through the Hugging
  - **HuggingFace Space**: A demo is now available at HuggingFace Spaces, allowing users to try out ChillTranslator without any setup.
 
 ## Possible future directions 🌟
-- **Integration**: offer a Python module and HTTP API, for use from other tools, browser extensions.
-- **HuggingFace / Replicate.com etc**: Running this on a fast system, perhaps on a HuggingFace Space could be good.
+- **Integration**: example showing use as Python module, HTTP API, for use from other tools, browser extensions.
 - **Speed** improvements.
    - Split text into sentences e.g: with “pysbd” for parallel processing of translations.
    - Use a hate speech scoring model instead of the current "spicy" score method.
