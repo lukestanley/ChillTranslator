@@ -152,7 +152,6 @@ def llm_stream_sans_network(
         return json_output
 
 
-# Function to call the RunPod API with a Pydantic model and movie name
 def llm_stream_serverless(prompt,model):
     RUNPOD_ENDPOINT_ID = env.get("RUNPOD_ENDPOINT_ID")
     RUNPOD_API_KEY = env.get("RUNPOD_API_KEY")
@@ -174,7 +173,8 @@ def llm_stream_serverless(prompt,model):
     response = requests.post(url, json=data, headers=headers)
     result = response.json()
     print(result)
-    output = result['output']
+    output = result['output'].replace("model:mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf\n", "")
+    # TODO: remove replacement once new version of runpod is deployed
     return json.loads(output)
 
 def query_ai_prompt(prompt, replacements, model_class):
