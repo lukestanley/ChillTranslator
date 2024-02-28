@@ -44,7 +44,7 @@ RUN python3 -m pip install requests pydantic uvicorn starlette fastapi sse_starl
 
 
 # Install llama-cpp-python (build with cuda)
-RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install git+https://github.com/lukestanley/llama-cpp-python.git@expose_json_grammar_convert_function
+#RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install git+https://github.com/lukestanley/llama-cpp-python.git@expose_json_grammar_convert_function
 
 CMD ["python3", "app.py"]
 
