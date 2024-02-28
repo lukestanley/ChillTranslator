@@ -18,6 +18,8 @@ Currently, it "translates" a built-in example of a spicy comment, and it can be 
 
 Online toxicity can undermine the quality of discourse, causing distress 😞 and driving people away from online communities. Or worse: it can create a viral toxic loop 🌀!
 
+<img src="https://github.com/lukestanley/ChillTranslator/assets/306671/2899f311-24ee-4ce4-ba76-d1de665aab01" width="300">
+
 ChillTranslator hopes to mitigate toxic comments by automatically rephrasing negative comments, while maintaining the original intent and promoting positive communication 🗣️➡️💬. These rephrased texts could be suggested to the original authors as alternatives, or users could enhance their internet experience with "rose-tinted glasses" 🌹😎, automatically translating spicy comments into versions that are easier and more calming to read.
 There could be all kinds of failure cases, but it's a start!
 
