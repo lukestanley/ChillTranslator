@@ -45,12 +45,29 @@ examples = [
     ["Your idea of a balanced diet is a biscuit in each hand."]
 ]
 
+description = """
+# ❄️ ChillTranslator 🤬 ➡️ 😎💬
+
+This is an early experimental tool aimed at reducing online toxicity by automatically transforming spicy or toxic comments into constructive, kinder dialogues using AI and large language models.
+
+ChillTranslator aims to help make online interactions more healthy and is now available for you to try directly in your browser.
+
+- **Converts** text to less toxic variations
+- **Preserves original intent**, focusing on constructive dialogue
+
+Try out the ChillTranslator here, or check out the project on GitHub:
+[https://github.com/lukestanley/ChillTranslator](https://github.com/lukestanley/ChillTranslator)
+
+ChillTranslator is released under the MIT License and contributions are very welcome!
+"""
+
 demo = gr.Interface(
     fn=chill_out, 
     inputs="text", 
     outputs="text",
     examples=examples,
-    cache_examples=True  # Enable caching
+    cache_examples=True,
+    description=description
 )
 
 demo.launch(max_threads=1, share=True)
