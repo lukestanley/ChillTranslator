@@ -89,16 +89,19 @@ These config options are likely to need tweaking. Please check out https://llama
 
 ### Local Usage
 
-ChillTranslator can be used locally to improve specific texts. This is how to see it in action:
+ChillTranslator can be used locally to improve specific texts. 
+This is how to see it in action from the command line with a default text:
 ```python
 python3 chill.py
 ```
-
 For improving a specific text of your choice, use the `-t` flag followed by your text enclosed in quotes:
 ```bash
 python3 chill.py -t "Your text goes here"
 ```
-
+To run the Gradio web server GUI:
+```python
+python3 app.py
+```
 Or chill can be imported as a module, with the improvement_loop function provided the text to improve.
 
 ## Contributing 🤝
