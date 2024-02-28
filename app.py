@@ -92,7 +92,7 @@ def chill_out(text):
 
 demo = gr.Interface(
     fn=chill_out, 
-    inputs=gr.inputs.Textbox(lines=2, placeholder="Enter some spicy text here..."), 
+    inputs=gr.Textbox(lines=2, placeholder="Enter some spicy text here..."), 
     outputs="html",
     examples=examples,
     cache_examples=True,
