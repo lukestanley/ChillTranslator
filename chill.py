@@ -114,6 +114,13 @@ def print_iteration_result(iteration, overall_score, time_used):
 def improvement_loop(input_text):
     global original_text
     global last_edit
+    global suggestions
+    global start_time
+    global max_iterations
+    suggestions = []
+    last_edit = ""
+    start_time = time.time()
+    max_iterations = 20
     original_text = input_text
 
     for iteration in range(1, max_iterations + 1):
