@@ -40,5 +40,17 @@ def chill_out(text):
     print("Got this input:", text)
     return str(improvement_loop(text))
 
-demo = gr.Interface(fn=chill_out, inputs="text", outputs="text")
+examples = [
+    ["You guys are so slow, we will never ship it!"],
+    ["Your idea of a balanced diet is a biscuit in each hand."]
+]
+
+demo = gr.Interface(
+    fn=chill_out, 
+    inputs="text", 
+    outputs="text",
+    examples=examples,
+    cache_examples=True  # Enable caching
+)
+
 demo.launch(max_threads=1, share=True)
