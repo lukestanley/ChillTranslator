@@ -40,7 +40,7 @@ global suggestions
 suggestions = []
 last_edit = ""
 start_time = time.time()
-max_iterations = 20
+max_iterations = 4
 
 
 def improve_text_attempt():
@@ -120,7 +120,7 @@ def improvement_loop(input_text):
     suggestions = []
     last_edit = ""
     start_time = time.time()
-    max_iterations = 20
+    max_iterations = 4
     original_text = input_text
 
     for iteration in range(1, max_iterations + 1):
