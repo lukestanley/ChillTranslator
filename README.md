@@ -16,10 +16,9 @@ This is an early experimental tool aimed at helping reduce online toxicity by au
 
 You can try out the ChillTranslator via the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
 
+It can also be used via the command line to improve a specific text of your choice, or it can be used as a module. All of the code is in this repo, for the serverles worker, the logic, and Gradio UI.
 
 ChillTranslator aims to help make online interactions more healthy.
-
-Currently, it "translates" a built-in example of a spicy comment, and it can be used via the command line to improve a specific text of your choice, or it can be imported as a module.
 
 Online toxicity can undermine the quality of discourse, causing distress 😞 and driving people away from online communities. Or worse: it can create a viral toxic loop 🌀!
 
