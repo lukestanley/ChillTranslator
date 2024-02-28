@@ -36,8 +36,9 @@ if LLM_WORKER == "http" or LLM_WORKER == "in_memory":
 from chill import improvement_loop
 
 
-def greet(text):
+def chill_out(text):
+    print("Got this input:", text)
     return str(improvement_loop(text))
 
-demo = gr.Interface(fn=greet, inputs="text", outputs="text")
+demo = gr.Interface(fn=chill_out, inputs="text", outputs="text")
 demo.launch(max_threads=1, share=True)

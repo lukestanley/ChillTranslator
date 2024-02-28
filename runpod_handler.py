@@ -33,7 +33,7 @@ def handler(job):
     print("schema", schema )
     output = llm_stream_sans_network_simple(prompt, schema)
     #print("got this output", str(output))
-    return f"model:{filename}\n{output}"
+    return output
     
 runpod.serverless.start({
     "handler": handler, 

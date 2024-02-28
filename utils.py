@@ -1,11 +1,9 @@
 import json
 from os import environ as env
 from typing import Any, Dict, Union
-# TODO: Make imports conditional on type of worker being used:
-import requests
 
+import requests
 from huggingface_hub import hf_hub_download  
-from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 
 
 # There are 3 ways to use the LLM model currently used:
@@ -18,7 +16,7 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 # The real OpenAI API has other ways to set the output format.
 # It's possible to switch to another LLM API by changing the llm_streaming function.
 # 3. Use the RunPod API, which is a paid service with severless GPU functions.
-# TODO: Update README with instructions on how to use the RunPod API and options.
+# See serverless.md for more information.
 
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
@@ -34,15 +32,19 @@ LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 MAX_TOKENS = int(env.get("MAX_TOKENS", 1000))
 TEMPERATURE = float(env.get("TEMPERATURE", 0.3))
 
-if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0 and (LLM_WORKER == "in_memory" or LLM_WORKER == "http"):
+performing_local_inference = (LLM_WORKER == "in_memory" or LLM_WORKER == "http")
+
+if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
     print(f"Using local model from {LLM_MODEL_PATH}")
-else:
+if performing_local_inference and not LLM_MODEL_PATH:
     print("No local LLM_MODEL_PATH environment variable set. We need a model, downloading model from HuggingFace Hub")
     LLM_MODEL_PATH =hf_hub_download(
         repo_id=env.get("REPO_ID", "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"),
         filename=env.get("MODEL_FILE", "mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf"),
     )
     print(f"Model downloaded to {LLM_MODEL_PATH}")
+if LLM_WORKER == "http" or LLM_WORKER == "in_memory":
+    from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 
 if in_memory_llm is None and LLM_WORKER == "in_memory":
     print("Loading model into memory. If you didn't want this, set the USE_HTTP_SERVER environment variable to 'true'.")
@@ -152,8 +154,8 @@ def llm_stream_sans_network(
 
 # Function to call the RunPod API with a Pydantic model and movie name
 def llm_stream_serverless(prompt,model):
-    RUNPOD_ENDPOINT_ID = env("RUNPOD_ENDPOINT_ID")
-    RUNPOD_API_KEY = env("RUNPOD_API_KEY")
+    RUNPOD_ENDPOINT_ID = env.get("RUNPOD_ENDPOINT_ID")
+    RUNPOD_API_KEY = env.get("RUNPOD_API_KEY")
     url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"
 
     headers = {
@@ -171,8 +173,8 @@ def llm_stream_serverless(prompt,model):
     
     response = requests.post(url, json=data, headers=headers)
     result = response.json()
-    output = result.get('output', '').replace("model:mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf\n", "")
-    print(output)
+    print(result)
+    output = result['output']
     return json.loads(output)
 
 def query_ai_prompt(prompt, replacements, model_class):
