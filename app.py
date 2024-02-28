@@ -48,9 +48,9 @@ examples = [
 description = """
 # ❄️ ChillTranslator 🤬 ➡️ 😎💬
 
-This is an early experimental tool aimed at reducing online toxicity by automatically transforming spicy or toxic comments into constructive, kinder dialogues using AI and large language models.
+This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
-ChillTranslator aims to help make online interactions more healthy and is now available for you to try directly in your browser.
+ChillTranslator aims to help make online interactions more healthy and is now available to try directly below.
 
 - **Converts** text to less toxic variations
 - **Preserves original intent**, focusing on constructive dialogue
@@ -58,7 +58,18 @@ ChillTranslator aims to help make online interactions more healthy and is now av
 Try out the ChillTranslator here, or check out the project on GitHub:
 [https://github.com/lukestanley/ChillTranslator](https://github.com/lukestanley/ChillTranslator)
 
-ChillTranslator is released under the MIT License and contributions are very welcome!
+## Contributing 🤝
+
+Contributions are very welcome!
+Especially:
+- pull requests,
+- free GPU credits
+- LLM API credits / access.
+
+ChillTranslator is released under the MIT License.
+
+Help make the internet a kinder place, one comment at a time.
+Your contribution could make a big difference!
 """
 
 demo = gr.Interface(

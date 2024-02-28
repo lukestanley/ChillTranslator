@@ -9,7 +9,7 @@ pinned: false
 # ❄️ ChillTranslator 🤬 ➡️ 😎💬
 
 
-This is an early experimental tool aimed at reducing online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
+This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
 
 ChillTranslator aims to help make online interactions more healthy.
@@ -21,36 +21,37 @@ Online toxicity can undermine the quality of discourse, causing distress 😞 an
 <img src="https://github.com/lukestanley/ChillTranslator/assets/306671/2899f311-24ee-4ce4-ba76-d1de665aab01" width="300">
 
 ChillTranslator hopes to mitigate toxic comments by automatically rephrasing negative comments, while maintaining the original intent and promoting positive communication 🗣️➡️💬. These rephrased texts could be suggested to the original authors as alternatives, or users could enhance their internet experience with "rose-tinted glasses" 🌹😎, automatically translating spicy comments into versions that are easier and more calming to read.
-There could be all kinds of failure cases, but it's a start!
+There could be all kinds of failure cases, but hey, it's a start!
 
 Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and constructive places? I think so!
 
 ![ChillTranslator demo](https://github.com/lukestanley/ChillTranslator/assets/306671/128611f4-3e8e-4c52-ba20-2ae61d727d52)
 
 
-You can try out the ChillTranslator directly in your browser through the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
+You can try out the ChillTranslator via the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
 
-## Approach ✨
-
-- **Converts** text to less toxic variations
-- **Preserves original intent**, focusing on constructive dialogue
-- **Offline LLM model**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python's server with Mixtral.
-
- - **HuggingFace Space**: A demo is now available at HuggingFace Spaces, allowing users to try out ChillTranslator without any setup.
+## Aims to:
+- **Convert** text to less toxic variations
+- **Preserve original intent**, focusing on constructive dialogue
+- **Self-hostable, serverless, or APIs**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python with Mixtral, with a HTTP server option, and a fast "serverless" backend using RunPod currently.
 
 ## Possible future directions 🌟
 - **Integration**: example showing use as Python module, HTTP API, for use from other tools, browser extensions.
 - **Speed** improvements.
+   - Generating rephrasings in parallel.
+   - Use Jigsaw dataset to find spicy comments, making a dataset for training a translation transformer, maybe like Google's T5 to run faster than Mixtral could.
    - Split text into sentences e.g: with “pysbd” for parallel processing of translations.
-   - Use a hate speech scoring model instead of the current "spicy" score method.
-   - Use a dataset of hate speech to make a dataset for training a translation transformer like Google's T5 to run faster than Mixtral could.
+   - Try using a 'Detoxify' scoring model instead of the current "spicy" score method.
    - Use natural language similarity techniques to compare possible rephrasing fidelity faster.
    - Enabling easy experimenting with online hosted LLM APIs
-   - Code refactoring to improve development speed!
+   - Making setup on different platforms easier
+- **Quality** improvements.
+   - Collecting a dataset of spicy comments and their rephrasings.
+   - Feedback loop: users could score rephrasings, or suggest their own.
 
-## Getting Started 🚀
+## Getting started 🚀
 
-### Try it Online
+### Try it online
 
 You can try out ChillTranslator without any installation by visiting the HuggingFace Space demo:
 ```
@@ -64,10 +65,7 @@ https://huggingface.co/spaces/lukestanley/ChillTranslator
    git clone https://github.com/lukestanley/ChillTranslator.git
    cd ChillTranslator
    ```
-2. Download a compatible and capable model like: [Mixtral-8x7B-Instruct-v0.1-GGUF](https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true). E.g:
-   ```
-   wget https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true -O mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf &
-   ```
+2. It will automaticaly download [Mixtral-8x7B-Instruct-v0.1-GGUF](https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf?download=true) by default. The model HuggingFace repo and filename can be switched by enviroment variables, or you can point to a different local path.
 3. Install dependencies, including a special fork of `llama-cpp-python`, and Nvidia GPU support if needed:
    ```
    pip install requests pydantic uvicorn starlette fastapi sse_starlette starlette_context pydantic_settings
@@ -81,7 +79,7 @@ https://huggingface.co/spaces/lukestanley/ChillTranslator
    ```
    python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf --port 5834 --n_ctx 4096 --use_mlock false --n_gpu_layers 20 &
    ```
-These config options may need tweaking. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
+These config options are likely to need tweaking. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
 
 
 ### Local Usage
