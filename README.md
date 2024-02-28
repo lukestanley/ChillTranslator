@@ -11,6 +11,11 @@ pinned: false
 
 This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
+![ChillTranslator demo](https://github.com/lukestanley/ChillTranslator/assets/306671/128611f4-3e8e-4c52-ba20-2ae61d727d52)
+
+
+You can try out the ChillTranslator via the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
+
 
 ChillTranslator aims to help make online interactions more healthy.
 
@@ -24,11 +29,6 @@ ChillTranslator hopes to mitigate toxic comments by automatically rephrasing neg
 There could be all kinds of failure cases, but hey, it's a start!
 
 Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and constructive places? I think so!
-
-![ChillTranslator demo](https://github.com/lukestanley/ChillTranslator/assets/306671/128611f4-3e8e-4c52-ba20-2ae61d727d52)
-
-
-You can try out the ChillTranslator via the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
 
 ## Aims to:
 - **Convert** text to less toxic variations
