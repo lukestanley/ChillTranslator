@@ -3,6 +3,12 @@ Fast severless GPU inference with RunPod
 
 This partly GPT-4 generated document explains the integration of Runpod with Docker, including testing the Runpod Dockerfile with Docker Compose, building and pushing the image to Docker Hub, and how `app.py` makes use of it. I skimmed it and added stuff to it, as a note to myself and others.
 
+# Motivation
+Fast inference is useful. Usually an existing hosted provider would be good for this, but I was worried about getting blocked given that we need to translate some spicy text input, the concern is that it could get flagged, and result in accounts being blocked.
+Also I needed something that could infer with JSON typed output, that matches particular schemas, and fast. So I found RunPod's "serverless" GPU, service.
+It can be used by chill.py and app.py, as one of the worker options.
+
+
 ## Testing with Docker Compose
 
 To test the Runpod Dockerfile, you can use Docker Compose which simplifies the process of running multi-container Docker applications. Here's how you can test it:
