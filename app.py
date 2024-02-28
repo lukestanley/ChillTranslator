@@ -1,3 +1,4 @@
+import json
 from os import environ as env
 from os import system as run
 from subprocess import check_output
@@ -65,23 +66,39 @@ Help make the internet a kinder place, one comment at a time.
 Your contribution could make a big difference!
 """
 
-
-# Now chill can import llama-cpp-python without an error:
 from chill import improvement_loop
 
 
 def chill_out(text):
     print("Got this input:", text)
-    return str(improvement_loop(text))
+    result: str = improvement_loop(text)
+    print("Got this result:", result)
+    result: dict = json.loads(result)
 
+    formatted_output = f"""
+    <div>
+        <h4>Edited text:</h4>
+        <p>{result['edit']}</p>
+        <h4>Details:</h4>
+        <ul>
+            <li>Critique: {result['critique']}</li>
+            <li>Faithfulness Score: {result['faithfulness_score']}</li>
+            <li>Spicy Score: {result['spicy_score']}</li>
+            <li>Overall Score: {result['overall_score']}</li>
+        </ul>
+    </div>
+    """
+    return formatted_output
 
 demo = gr.Interface(
     fn=chill_out, 
-    inputs="text", 
-    outputs="text",
+    inputs=gr.inputs.Textbox(lines=2, placeholder="Enter some spicy text here..."), 
+    outputs="html",
     examples=examples,
     cache_examples=True,
-    description=description
+    description=description,
+    title="ChillTranslator",
+    allow_flagging=False,
 )
 
 demo.launch(max_threads=1, share=True)
