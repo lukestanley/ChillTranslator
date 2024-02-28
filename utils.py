@@ -152,7 +152,7 @@ def llm_stream_sans_network(
 
 # Function to call the RunPod API with a Pydantic model and movie name
 def llm_stream_serverless(prompt,model):
-    RUNPOD_ENDPOINT_ID = env("RUNPOD_API_KEY")
+    RUNPOD_ENDPOINT_ID = env("RUNPOD_ENDPOINT_ID")
     RUNPOD_API_KEY = env("RUNPOD_API_KEY")
     url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"
 
