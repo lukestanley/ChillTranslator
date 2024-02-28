@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  runpod:
+    build:
+      context: .
+      dockerfile: runpod.dockerfile
+    volumes:
+      - ./.cache:/runpod-volume/.cache
+      - ./test.sh:/test.sh
+    command: /test.sh
+    entrypoint: /usr/bin/python3
