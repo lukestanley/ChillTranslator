@@ -98,7 +98,7 @@ demo = gr.Interface(
     cache_examples=True,
     description=description,
     title="ChillTranslator",
-    allow_flagging=False,
+    allow_flagging="never",
 )
 
 demo.launch(max_threads=1, share=True)
