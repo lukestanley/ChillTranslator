@@ -32,14 +32,6 @@ LLM_WORKER = env.get("LLM_WORKER", "runpod")
 if LLM_WORKER == "http" or LLM_WORKER == "in_memory":
     inference_binary_check()
 
-# Now chill can import llama-cpp-python without an error:
-from chill import improvement_loop
-
-
-def chill_out(text):
-    print("Got this input:", text)
-    return str(improvement_loop(text))
-
 examples = [
     ["You guys are so slow, we will never ship it!"],
     ["Your idea of a balanced diet is a biscuit in each hand."]
@@ -72,6 +64,16 @@ ChillTranslator is released under the MIT License.
 Help make the internet a kinder place, one comment at a time.
 Your contribution could make a big difference!
 """
+
+
+# Now chill can import llama-cpp-python without an error:
+from chill import improvement_loop
+
+
+def chill_out(text):
+    print("Got this input:", text)
+    return str(improvement_loop(text))
+
 
 demo = gr.Interface(
     fn=chill_out, 
