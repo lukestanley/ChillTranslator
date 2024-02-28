@@ -36,18 +36,24 @@ You can try out the ChillTranslator via the HuggingFace Space demo at [https://h
 - **Self-hostable, serverless, or APIs**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python with Mixtral, with a HTTP server option, and a fast "serverless" backend using RunPod currently.
 
 ## Possible future directions 🌟
-- **Integration**: example showing use as Python module, HTTP API, for use from other tools, browser extensions.
-- **Speed** improvements.
-   - Generating rephrasings in parallel.
-   - Use Jigsaw dataset to find spicy comments, making a dataset for training a translation transformer, maybe like Google's T5 to run faster than Mixtral could.
-   - Split text into sentences e.g: with “pysbd” for parallel processing of translations.
-   - Try using a 'Detoxify' scoring model instead of the current "spicy" score method.
-   - Use natural language similarity techniques to compare possible rephrasing fidelity faster.
-   - Enabling easy experimenting with online hosted LLM APIs
-   - Making setup on different platforms easier
-- **Quality** improvements.
-   - Collecting a dataset of spicy comments and their rephrasings.
-   - Feedback loop: users could score rephrasings, or suggest their own.
+
+**Speed:**
+- Generating rephrasings in parallel.
+- Show intermediate results to the user, while waiting for the final result.
+- Split text into sentences e.g: with “pysbd” for parallel processing of translations.
+
+**Speed and Quality:**
+- Use Jigsaw dataset to find spicy comments, making a dataset for training a translation transformer, maybe like Google's T5 to run faster than Mixtral could.
+- Try using a 'Detoxify' scoring model instead of the current "spicy" score method.
+- Use natural language similarity techniques to compare possible rephrasing fidelity faster.
+- Collecting a dataset of spicy comments and their rephrasings.
+- Feedback loop: users could score rephrasings, or suggest their own.
+
+**Distribution:**
+- Better example showing use as Python module, HTTP API, for use from other tools, browser extensions.
+- Enabling easy experimenting with online hosted LLM APIs
+- Making setup on different platforms easier
+
 
 ## Getting started 🚀
 
