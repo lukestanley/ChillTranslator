@@ -1,12 +1,14 @@
 import json
 from os import environ as env
 from typing import Any, Dict, Union
+# TODO: Make imports conditional on type of worker being used:
 import requests
 
 from huggingface_hub import hf_hub_download  
 from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 
-# There are two ways to use the LLM model currently used:
+
+# There are 3 ways to use the LLM model currently used:
 # 1. Use the HTTP server (USE_HTTP_SERVER=True), this is good for development
 # when you want to change the logic of the translator without restarting the server.
 # 2. Load the model into memory
@@ -15,18 +17,24 @@ from llama_cpp import Llama, LlamaGrammar, json_schema_to_gbnf
 # to the OpenAI API but adds a unique "grammar" parameter.
 # The real OpenAI API has other ways to set the output format.
 # It's possible to switch to another LLM API by changing the llm_streaming function.
+# 3. Use the RunPod API, which is a paid service with severless GPU functions.
+# TODO: Update README with instructions on how to use the RunPod API and options.
 
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
+worker_options = ["runpod", "http", "in_memory"]
 
-N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", 20)) # Default to -1, which means use all layers if available
-CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 4096))
+LLM_WORKER = env.get("LLM_WORKER", "runpod")
+if LLM_WORKER not in worker_options:
+    raise ValueError(f"Invalid worker: {LLM_WORKER}")
+N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", -1)) # Default to -1, use all layers if available
+CONTEXT_SIZE = int(env.get("CONTEXT_SIZE", 2048))
 LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
-USE_HTTP_SERVER = env.get("USE_HTTP_SERVER", "false").lower() == "true"
+
 MAX_TOKENS = int(env.get("MAX_TOKENS", 1000))
 TEMPERATURE = float(env.get("TEMPERATURE", 0.3))
 
-if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
+if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0 and (LLM_WORKER == "in_memory" or LLM_WORKER == "http"):
     print(f"Using local model from {LLM_MODEL_PATH}")
 else:
     print("No local LLM_MODEL_PATH environment variable set. We need a model, downloading model from HuggingFace Hub")
@@ -36,7 +44,7 @@ else:
     )
     print(f"Model downloaded to {LLM_MODEL_PATH}")
 
-if in_memory_llm is None and USE_HTTP_SERVER is False:
+if in_memory_llm is None and LLM_WORKER == "in_memory":
     print("Loading model into memory. If you didn't want this, set the USE_HTTP_SERVER environment variable to 'true'.")
     in_memory_llm = Llama(model_path=LLM_MODEL_PATH, n_ctx=CONTEXT_SIZE, n_gpu_layers=N_GPU_LAYERS, verbose=True)
 
@@ -141,33 +149,37 @@ def llm_stream_sans_network(
         json_output = json.loads(output_text)
         return json_output
 
-def query_ai_prompt(prompt, replacements, model_class, in_memory=True):
+
+# Function to call the RunPod API with a Pydantic model and movie name
+def llm_stream_serverless(prompt,model):
+    RUNPOD_ENDPOINT_ID = env("RUNPOD_API_KEY")
+    RUNPOD_API_KEY = env("RUNPOD_API_KEY")
+    url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {RUNPOD_API_KEY}'
+    }
+    
+    schema = model.schema()
+    data = {
+        'input': {
+            'schema': json.dumps(schema),
+            'prompt': prompt
+        }
+    }
+    
+    response = requests.post(url, json=data, headers=headers)
+    result = response.json()
+    output = result.get('output', '').replace("model:mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf\n", "")
+    print(output)
+    return json.loads(output)
+
+def query_ai_prompt(prompt, replacements, model_class):
     prompt = replace_text(prompt, replacements)
-    if in_memory:
-        return llm_stream_sans_network(prompt, model_class)
-    else:
+    if LLM_WORKER == "runpod":
+        return llm_stream_serverless(prompt, model_class)
+    if LLM_WORKER == "http":
         return llm_streaming(prompt, model_class)
-
-
-def llm_stream_sans_network_simple(
-    prompt: str, json_schema:str
-):
-    grammar = LlamaGrammar.from_json_schema(json_schema)
-
-    stream = in_memory_llm(
-        prompt,
-        max_tokens=MAX_TOKENS,
-        temperature=TEMPERATURE,
-        grammar=grammar,
-        stream=True
-    )
-
-    output_text = ""
-    for chunk in stream:
-        result = chunk["choices"][0]
-        print(result["text"], end='', flush=True)
-        output_text = output_text + result["text"]
-        #yield result["text"]
-
-    print('\n')
-    return output_text
+    if LLM_WORKER == "in_memory":
+        return llm_stream_sans_network(prompt, model_class)
