@@ -13,7 +13,9 @@ from promptObjects import (
     SpicyScore,
 )
 
-# This script uses the llama_cpp server to improve a text, it depends on the llama_cpp server being installed and running with a model loaded.
+# This script uses the large language model to improve a text, it depends on a llama_cpp server being setup with a model loaded.
+# There are several different interfaces it can use, see utils.py for more details.
+# Here is a bit of a local setup example:
 # pip install llama-cpp-python[server] --upgrade
 # python3 -m llama_cpp.server --model mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf  --port 5834 --n_ctx 4096 --use_mlock false
 # Run this script:
@@ -40,7 +42,6 @@ global suggestions
 suggestions = []
 last_edit = ""
 start_time = time.time()
-max_iterations = 4
 
 
 def improve_text_attempt():
@@ -116,11 +117,10 @@ def improvement_loop(input_text):
     global last_edit
     global suggestions
     global start_time
-    global max_iterations
     suggestions = []
     last_edit = ""
     start_time = time.time()
-    max_iterations = 4
+    max_iterations = 6
     original_text = input_text
 
     for iteration in range(1, max_iterations + 1):
