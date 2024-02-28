@@ -50,13 +50,14 @@ description = """
 
 This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
-ChillTranslator aims to help make online interactions more healthy and is now available to try directly below.
+ChillTranslator aims to help make online interactions more healthy. 
+It aims to:
+- **Convert** text to less toxic variations
+- **Preserve original intent**, focusing on constructive dialogue
 
-- **Converts** text to less toxic variations
-- **Preserves original intent**, focusing on constructive dialogue
-
-Try out the ChillTranslator here, or check out the project on GitHub:
+The project is on GitHub:
 [https://github.com/lukestanley/ChillTranslator](https://github.com/lukestanley/ChillTranslator)
+The repo is the same repo for the HuggingFace Space, the serverless worker, and the logic.
 
 ## Contributing 🤝
 
