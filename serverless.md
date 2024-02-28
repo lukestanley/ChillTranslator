@@ -41,9 +41,11 @@ After testing and ensuring that everything works as expected, you can build the 
 
 # Runpod previsioning:
 You'll need an account on Runpod with credit.
-You'll need a serverless GPU endpoint setting up using your Docker image.
-
+You'll need a serverless GPU endpoint setting up using your Docker image setup here:
+https://www.runpod.io/console/serverless
 It has a Flashboot feature that seems like Firecracker with GPU support, it might be using Cloud Hypervisor under the hood, currently Firecracker has no GPU support. Fly.io also has something similar, with Cloud Hypervisor.
+You'll need the secret saved somewhere securely. This will likely end up as a securely treated env var for use by app.py later.
+You'll also need the endpoint ID.
 
 ## Runpod Integration in `app.py`
 
