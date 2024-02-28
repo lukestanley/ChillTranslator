@@ -26,12 +26,15 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
 ![ChillTranslator demo](https://github.com/lukestanley/ChillTranslator/assets/306671/128611f4-3e8e-4c52-ba20-2ae61d727d52)
 
 
+You can try out the ChillTranslator directly in your browser through the HuggingFace Space demo at [https://huggingface.co/spaces/lukestanley/ChillTranslator](https://huggingface.co/spaces/lukestanley/ChillTranslator).
+
 ## Approach ✨
 
 - **Converts** text to less toxic variations
 - **Preserves original intent**, focusing on constructive dialogue
 - **Offline LLM model**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python's server with Mixtral.
 
+ - **HuggingFace Space**: A demo is now available at HuggingFace Spaces, allowing users to try out ChillTranslator without any setup.
 
 ## Possible future directions 🌟
 - **Integration**: offer a Python module and HTTP API, for use from other tools, browser extensions.
@@ -45,6 +48,13 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
    - Code refactoring to improve development speed!
 
 ## Getting Started 🚀
+
+### Try it Online
+
+You can try out ChillTranslator without any installation by visiting the HuggingFace Space demo:
+```
+https://huggingface.co/spaces/lukestanley/ChillTranslator
+```
 
 ### Installation
 
@@ -73,9 +83,9 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
 These config options may need tweaking. Please check out https://llama-cpp-python.readthedocs.io/en/latest/ for more info.
 
 
-### Usage
+### Local Usage
 
-ChillTranslator currently has an example spicy comment it works on fixing right away. This is how to see it in action:
+ChillTranslator can be used locally to improve specific texts. This is how to see it in action:
 ```python
 python3 chill.py
 ```
@@ -89,7 +99,7 @@ Or chill can be imported as a module, with the improvement_loop function provide
 
 ## Contributing 🤝
 
-Contributions are welcome!
+Contributions are very welcome!
 Especially:
 - pull requests,
 - free GPU credits
