@@ -2,6 +2,7 @@ import argparse
 import json
 import time
 import uuid
+from data import log_to_jsonl
 from datetime import datetime
 from utils import calculate_overall_score, query_ai_prompt
 from promptObjects import (
@@ -48,10 +49,6 @@ start_time = None
 
 
 
-def log_to_jsonl(file_path, data):
-    with open(file_path, 'a') as file:
-        jsonl_str = json.dumps(data) + "\n"
-        file.write(jsonl_str)
 
 def improve_text_attempt():
     global suggestions

@@ -3,10 +3,9 @@ import json
 from time import time, sleep
 from os import environ as env
 from typing import Any, Dict, Union
-import uuid
-
+from data import log_to_jsonl
 import requests
-from huggingface_hub import hf_hub_download  
+from huggingface_hub import hf_hub_download
 
 
 # There are 4 ways to use a LLM model currently used:
@@ -235,10 +234,6 @@ def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict
         print("No pydantic model class provided, returning without class validation")
     return json.loads(output)
 
-def log_to_jsonl(file_path, data):
-    with open(file_path, 'a') as file:
-        jsonl_str = json.dumps(data) + "\n"
-        file.write(jsonl_str)
 
 
 def query_ai_prompt(prompt, replacements, model_class):
