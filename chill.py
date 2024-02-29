@@ -144,7 +144,7 @@ def improvement_loop(input_text):
         except ValueError as e:
             print("ValueError:", e)
             continue
-
+    assert len(suggestions) > 0
     return suggestions[0]
 
 
