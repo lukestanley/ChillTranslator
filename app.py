@@ -50,12 +50,25 @@ Help make the internet a kinder place, one comment at a time. Your contribution 
 """
 
 from chill import improvement_loop
+import uuid
+from datetime import datetime
 
+def log_to_jsonl(file_path, data):
+    with open(file_path, 'a') as file:
+        jsonl_str = json.dumps(data) + "\n"
+        file.write(jsonl_str)
 
 def chill_out(text):
+    log_entry = {
+        "uuid": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "input": text
+    }
     print("Got this input:", text)
     result: dict = improvement_loop(text)
     print("Got this result:", result)
+    log_entry["output"] = result
+    log_to_jsonl('inputs_and_outputs.jsonl', log_entry)
 
     formatted_output = f"""
     <div>

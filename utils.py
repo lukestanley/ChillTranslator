@@ -1,7 +1,9 @@
+import datetime
 import json
 from time import time, sleep
 from os import environ as env
 from typing import Any, Dict, Union
+import uuid
 
 import requests
 from huggingface_hub import hf_hub_download  
@@ -233,17 +235,33 @@ def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict
         print("No pydantic model class provided, returning without class validation")
     return json.loads(output)
 
+def log_to_jsonl(file_path, data):
+    with open(file_path, 'a') as file:
+        jsonl_str = json.dumps(data) + "\n"
+        file.write(jsonl_str)
+
+
 def query_ai_prompt(prompt, replacements, model_class):
     prompt = replace_text(prompt, replacements)
     if LLM_WORKER == "mistral":
-        return llm_stream_mistral_api(prompt, model_class)
+        result = llm_stream_mistral_api(prompt, model_class)
     if LLM_WORKER == "mistral":
-        return llm_stream_mistral_api(prompt, model_class)
+        result = llm_stream_mistral_api(prompt, model_class)
     if LLM_WORKER == "runpod":
-        return llm_stream_serverless(prompt, model_class)
+        result = llm_stream_serverless(prompt, model_class)
     if LLM_WORKER == "http":
-        return llm_streaming(prompt, model_class)
+        result = llm_streaming(prompt, model_class)
     if LLM_WORKER == "in_memory":
-        return llm_stream_sans_network(prompt, model_class)
+        result = llm_stream_sans_network(prompt, model_class)
+    
+    log_entry = {
+        "uuid": str(uuid.uuid4()),
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "worker": LLM_WORKER,
+        "prompt_input": prompt,
+        "prompt_output": result
+    }
+    log_to_jsonl('prompt_inputs_and_outputs.jsonl', log_entry)
 
+    return result
 
