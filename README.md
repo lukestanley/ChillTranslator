@@ -1,8 +1,8 @@
 ---
-title: ChillTranslator
+title: ❄️ ChillTranslator 🤬 ➡️ 😎💬
 emoji: ❄️
 colorFrom: red
-colorTo: pink
+colorTo: blue
 sdk: docker
 pinned: false
 ---
