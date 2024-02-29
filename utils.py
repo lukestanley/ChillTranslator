@@ -176,6 +176,8 @@ def llm_stream_serverless(prompt,model):
     assert response.status_code == 200, f"Unexpected RunPod API status code: {response.status_code} with body: {response.text}"
     result = response.json()
     print(result)
+    # TODO: After a 30 second timeout, a job ID is returned in the response instead,
+    # and the client must poll the job status endpoint to get the result.
     output = result['output'].replace("model:mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf\n", "")
     # TODO: remove replacement once new version of runpod is deployed
     return json.loads(output)
