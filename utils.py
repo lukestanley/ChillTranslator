@@ -1,4 +1,5 @@
 import json
+from time import time, sleep
 from os import environ as env
 from typing import Any, Dict, Union
 
@@ -6,7 +7,7 @@ import requests
 from huggingface_hub import hf_hub_download  
 
 
-# There are 3 ways to use the LLM model currently used:
+# There are 4 ways to use a LLM model currently used:
 # 1. Use the HTTP server (USE_HTTP_SERVER=True), this is good for development
 # when you want to change the logic of the translator without restarting the server.
 # 2. Load the model into memory
@@ -17,12 +18,13 @@ from huggingface_hub import hf_hub_download
 # It's possible to switch to another LLM API by changing the llm_streaming function.
 # 3. Use the RunPod API, which is a paid service with severless GPU functions.
 # See serverless.md for more information.
+# 4. Use the Mistral API, which is a paid services.
 
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
-worker_options = ["runpod", "http", "in_memory"]
+worker_options = ["runpod", "http", "in_memory", "mistral"]
 
-LLM_WORKER = env.get("LLM_WORKER", "runpod")
+LLM_WORKER = env.get("LLM_WORKER", "mistral")
 if LLM_WORKER not in worker_options:
     raise ValueError(f"Invalid worker: {LLM_WORKER}")
 N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", -1)) # Default to -1, use all layers if available
@@ -184,9 +186,66 @@ def llm_stream_serverless(prompt,model):
 
 def query_ai_prompt(prompt, replacements, model_class):
     prompt = replace_text(prompt, replacements)
+    if LLM_WORKER == "mistral":
+        return llm_stream_mistral_api(prompt, model_class)
+    if LLM_WORKER == "mistral":
+        return llm_stream_mistral_api(prompt, model_class)
     if LLM_WORKER == "runpod":
         return llm_stream_serverless(prompt, model_class)
     if LLM_WORKER == "http":
         return llm_streaming(prompt, model_class)
     if LLM_WORKER == "in_memory":
         return llm_stream_sans_network(prompt, model_class)
+
+
+
+# Global variables to enforce rate limiting
+LAST_REQUEST_TIME = None
+REQUEST_INTERVAL = 0.5  # Minimum time interval between requests in seconds
+
+def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict[str, Any]]:
+    global LAST_REQUEST_TIME
+    current_time = time()
+    if LAST_REQUEST_TIME is not None:
+        elapsed_time = current_time - LAST_REQUEST_TIME
+        if elapsed_time < REQUEST_INTERVAL:
+            sleep_time = REQUEST_INTERVAL - elapsed_time
+            sleep(sleep_time)
+            print(f"Slept for {sleep_time} seconds to enforce rate limit")
+    LAST_REQUEST_TIME = time()
+
+    MISTRAL_API_URL = env.get("MISTRAL_API_URL", "https://api.mistral.ai/v1/chat/completions")
+    MISTRAL_API_KEY = env.get("MISTRAL_API_KEY", None)
+    if not MISTRAL_API_KEY:
+        raise ValueError("MISTRAL_API_KEY environment variable not set")
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {MISTRAL_API_KEY}'
+    }
+    data = {
+        'model': 'mistral-small-latest',
+        'messages': [
+            {
+                'role': 'user',
+                'response_format': {'type': 'json_object'},
+                'content': prompt
+            }
+        ]
+    }
+    response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
+    if response.status_code != 200:
+        raise ValueError(f"Unexpected Mistral API status code: {response.status_code} with body: {response.text}")
+    result = response.json()
+    print(result)
+    output = result['choices'][0]['message']['content']
+    if pydantic_model_class:
+        parsed_result = pydantic_model_class.model_validate_json(output)
+        print(parsed_result)
+        # This will raise an exception if the model is invalid,
+        # TODO: handle exception with retry logic
+    else:
+        print("No pydantic model class provided, returning without class validation")
+    return json.loads(output)
+
+
