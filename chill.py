@@ -1,6 +1,8 @@
 import argparse
 import json
 import time
+import uuid
+from datetime import datetime
 from utils import calculate_overall_score, query_ai_prompt
 from promptObjects import (
     improve_prompt,
@@ -44,6 +46,12 @@ last_edit = ""
 request_count = 0
 start_time = None
 
+
+
+def log_to_jsonl(file_path, data):
+    with open(file_path, 'a') as file:
+        jsonl_str = json.dumps(data) + "\n"
+        file.write(jsonl_str)
 
 def improve_text_attempt():
     global suggestions
@@ -159,6 +167,13 @@ def improvement_loop(input_text):
     suggestions[0]["iteration_count"] = iteration_count
     suggestions[0]["max_allowed_iterations"] = max_iterations
     suggestions[0]["time_used"] = time_used
+    log_entry = {
+        "uuid": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "input": original_text,
+        "output": suggestions[0]
+    }
+    log_to_jsonl('inputs_and_outputs.jsonl', log_entry)
     return suggestions[0]
 
 
