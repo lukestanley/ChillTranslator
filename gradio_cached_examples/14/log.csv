@@ -2,26 +2,32 @@ output,flag,username,timestamp
 "
     <div>
         <h4>Edited text:</h4>
-        <p>I am concerned that our current pace might delay the project's completion.</p>
+        <p>It seems we're moving a bit slower than anticipated. I'm concerned we might not meet our shipping deadline.</p>
         <h4>Details:</h4>
         <ul>
-            <li>Critique: The revised text does not convey the same level of urgency as the original.</li>
-            <li>Faithfulness Score: 0.85</li>
-            <li>Spicy Score: 0.2</li>
-            <li>Overall Score: 0.88</li>
+            <li>Critique: This is well-phrased and less inflammatory than the original. However, it might be more direct and still polite to say: 'We're behind schedule. I'm concerned we might not make our shipping deadline.'</li>
+            <li>Faithfulness score: 95%</li>
+            <li>Spicy score: 10%</li>
+            <li>Overall score: 97%</li>
+            <li>Iterations: 33% 2 of max allowed iterations: 6</li> 
+            <li>Time used: 2.24 seconds</li>
+            <li>LLM requests made: 4</li>
         </ul>
     </div>
-    ",,,2024-02-29 13:07:52.046527
+    ",,,2024-02-29 17:35:32.665693
 "
     <div>
         <h4>Edited text:</h4>
-        <p>I think your idea of a balanced diet may need some adjustments.</p>
+        <p>It seems your understanding of a balanced diet differs from mine, as it appears to include biscuits quite often.</p>
         <h4>Details:</h4>
         <ul>
-            <li>Critique: This critique is too vague and does not address the specific issues with the provided text.</li>
-            <li>Faithfulness Score: 0.5</li>
-            <li>Spicy Score: 0</li>
-            <li>Overall Score: 0.5</li>
+            <li>Critique: This critique is more subtle and less confrontational, which is good for preventing inflaming discussions. However, it could be more concise and closer to the original semantic intent. A possible revision could be: 'Your concept of a balanced diet appears to involve biscuits more often than usual.'</li>
+            <li>Faithfulness score: 95%</li>
+            <li>Spicy score: 10%</li>
+            <li>Overall score: 97%</li>
+            <li>Iterations: 33% 2 of max allowed iterations: 6</li> 
+            <li>Time used: 2.36 seconds</li>
+            <li>LLM requests made: 4</li>
         </ul>
     </div>
-    ",,,2024-02-29 13:08:14.666888
+    ",,,2024-02-29 17:35:35.029163

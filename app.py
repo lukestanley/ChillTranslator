@@ -67,6 +67,8 @@ def chill_out(text):
             <li>Faithfulness score: {result['faithfulness_score']:.0%}</li>
             <li>Spicy score: {result['spicy_score']:.0%}</li>
             <li>Overall score: {result['overall_score']:.0%}</li>
+            <li>Iterations: {result['iteration_count'] / result['max_allowed_iterations']:.0%} {result['iteration_count']} of max allowed iterations: {result['max_allowed_iterations']}</li> 
+            <li>Time used: {result['time_used']:.2f} seconds</li>
             <li>LLM requests made: {result['request_count']}</li>
         </ul>
     </div>

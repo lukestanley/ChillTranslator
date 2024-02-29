@@ -42,7 +42,7 @@ global suggestions
 suggestions = []
 last_edit = ""
 request_count = 0
-start_time = time.time()
+start_time = None
 
 
 def improve_text_attempt():
@@ -125,6 +125,7 @@ def improvement_loop(input_text):
     global suggestions
     global request_count
     global start_time
+    iteration_count = 0
     suggestions = []
     last_edit = ""
     request_count = 0
@@ -133,6 +134,7 @@ def improvement_loop(input_text):
     original_text = input_text
 
     for iteration in range(1, max_iterations + 1):
+        iteration_count = iteration
         try:
             if iteration % 2 == 1:
                 last_edit = improve_text_attempt()
@@ -154,6 +156,9 @@ def improvement_loop(input_text):
             print("ValueError:", e)
             continue
     assert len(suggestions) > 0
+    suggestions[0]["iteration_count"] = iteration_count
+    suggestions[0]["max_allowed_iterations"] = max_iterations
+    suggestions[0]["time_used"] = time_used
     return suggestions[0]
 
 
