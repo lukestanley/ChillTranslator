@@ -41,24 +41,30 @@ Outputs something like this:
 global suggestions
 suggestions = []
 last_edit = ""
+request_count = 0
 start_time = time.time()
 
 
 def improve_text_attempt():
     global suggestions
+    global request_count
     replacements = {
         "original_text": json.dumps(original_text),
         "previous_suggestions": json.dumps(suggestions, indent=2),
     }
+    request_count += 1
     resp_json = query_ai_prompt(improve_prompt, replacements, ImprovedText)
     return resp_json["text"]
 
 
 def critique_text(last_edit):
+    global suggestions
+    global request_count
     replacements = {"original_text": original_text, "last_edit": last_edit}
 
     # Query the AI for each of the new prompts separately
 
+    request_count += 3
     critique_resp = query_ai_prompt(critique_prompt, replacements, Critique)
     faithfulness_resp = query_ai_prompt(
         faith_scorer_prompt, replacements, FaithfulnessScore
@@ -101,6 +107,7 @@ def update_suggestions(critique_dict):
     suggestions = sorted(suggestions, key=lambda x: x["overall_score"], reverse=True)[
         :2
     ]
+    critique_dict["request_count"] = request_count
 
 
 def print_iteration_result(iteration, overall_score, time_used):
@@ -116,9 +123,11 @@ def improvement_loop(input_text):
     global original_text
     global last_edit
     global suggestions
+    global request_count
     global start_time
     suggestions = []
     last_edit = ""
+    request_count = 0
     start_time = time.time()
     max_iterations = 6
     original_text = input_text

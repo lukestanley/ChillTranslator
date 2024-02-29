@@ -64,9 +64,10 @@ def chill_out(text):
         <h4>Details:</h4>
         <ul>
             <li>Critique: {result['critique']}</li>
-            <li>Faithfulness Score: {result['faithfulness_score']}</li>
-            <li>Spicy Score: {result['spicy_score']}</li>
-            <li>Overall Score: {result['overall_score']}</li>
+            <li>Faithfulness score: {result['faithfulness_score']}</li>
+            <li>Spicy score: {result['spicy_score']}</li>
+            <li>Overall score: {result['overall_score']}</li>
+            <li>LLM requests made: {result['request_count']}</li>
         </ul>
     </div>
     """
