@@ -1,2 +1,3 @@
 .aider*
 .cache
+*.pyc

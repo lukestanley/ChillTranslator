@@ -155,6 +155,8 @@ def llm_stream_sans_network(
 def llm_stream_serverless(prompt,model):
     RUNPOD_ENDPOINT_ID = env.get("RUNPOD_ENDPOINT_ID")
     RUNPOD_API_KEY = env.get("RUNPOD_API_KEY")
+    assert RUNPOD_ENDPOINT_ID, "RUNPOD_ENDPOINT_ID environment variable not set"
+    assert RUNPOD_API_KEY, "RUNPOD_API_KEY environment variable not set"
     url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"
 
     headers = {
@@ -171,6 +173,7 @@ def llm_stream_serverless(prompt,model):
     }
     
     response = requests.post(url, json=data, headers=headers)
+    assert response.status_code == 200, f"Unexpected RunPod API status code: {response.status_code} with body: {response.text}"
     result = response.json()
     print(result)
     output = result['output'].replace("model:mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf\n", "")
