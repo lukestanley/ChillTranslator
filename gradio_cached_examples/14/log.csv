@@ -1,0 +1,27 @@
+output,flag,username,timestamp
+"
+    <div>
+        <h4>Edited text:</h4>
+        <p>I am concerned that our current pace might delay the project's completion.</p>
+        <h4>Details:</h4>
+        <ul>
+            <li>Critique: The revised text does not convey the same level of urgency as the original.</li>
+            <li>Faithfulness Score: 0.85</li>
+            <li>Spicy Score: 0.2</li>
+            <li>Overall Score: 0.88</li>
+        </ul>
+    </div>
+    ",,,2024-02-29 13:07:52.046527
+"
+    <div>
+        <h4>Edited text:</h4>
+        <p>I think your idea of a balanced diet may need some adjustments.</p>
+        <h4>Details:</h4>
+        <ul>
+            <li>Critique: This critique is too vague and does not address the specific issues with the provided text.</li>
+            <li>Faithfulness Score: 0.5</li>
+            <li>Spicy Score: 0</li>
+            <li>Overall Score: 0.5</li>
+        </ul>
+    </div>
+    ",,,2024-02-29 13:08:14.666888
