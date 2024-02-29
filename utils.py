@@ -184,21 +184,6 @@ def llm_stream_serverless(prompt,model):
     # TODO: remove replacement once new version of runpod is deployed
     return json.loads(output)
 
-def query_ai_prompt(prompt, replacements, model_class):
-    prompt = replace_text(prompt, replacements)
-    if LLM_WORKER == "mistral":
-        return llm_stream_mistral_api(prompt, model_class)
-    if LLM_WORKER == "mistral":
-        return llm_stream_mistral_api(prompt, model_class)
-    if LLM_WORKER == "runpod":
-        return llm_stream_serverless(prompt, model_class)
-    if LLM_WORKER == "http":
-        return llm_streaming(prompt, model_class)
-    if LLM_WORKER == "in_memory":
-        return llm_stream_sans_network(prompt, model_class)
-
-
-
 # Global variables to enforce rate limiting
 LAST_REQUEST_TIME = None
 REQUEST_INTERVAL = 0.5  # Minimum time interval between requests in seconds
@@ -247,5 +232,18 @@ def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict
     else:
         print("No pydantic model class provided, returning without class validation")
     return json.loads(output)
+
+def query_ai_prompt(prompt, replacements, model_class):
+    prompt = replace_text(prompt, replacements)
+    if LLM_WORKER == "mistral":
+        return llm_stream_mistral_api(prompt, model_class)
+    if LLM_WORKER == "mistral":
+        return llm_stream_mistral_api(prompt, model_class)
+    if LLM_WORKER == "runpod":
+        return llm_stream_serverless(prompt, model_class)
+    if LLM_WORKER == "http":
+        return llm_streaming(prompt, model_class)
+    if LLM_WORKER == "in_memory":
+        return llm_stream_sans_network(prompt, model_class)
 
 
