@@ -32,12 +32,13 @@ Could Reddit, Twitter, Hacker News, or even YouTube comments be more calm and co
 ## Aims to:
 - **Convert** text to less toxic variations
 - **Preserve original intent**, focusing on constructive dialogue
-- **Self-hostable, serverless, or APIs**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python with Mixtral, with a HTTP server option, and a fast "serverless" backend using RunPod currently.
+- **Self-hostable, serverless, or APIs**: running DIY could save costs, avoid needing to sign up to APIs, and avoid the risk of toxic content causing API access to be revoked. We use llama-cpp-python with Mixtral, with a HTTP server option, a fast "serverless" backend using RunPod currently which had some reliability issues, so I'm using Mistral's own API right now until I can figure out a more reliable serverless method.
 
 ## Possible future directions 🌟
 
 **Speed:**
 - Generating rephrasings in parallel.
+- Combined some LLM tasks together, to reduce request overhead.
 - Show intermediate results to the user, while waiting for the final result.
 - Split text into sentences e.g: with “pysbd” for parallel processing of translations.
 
