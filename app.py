@@ -71,9 +71,8 @@ from chill import improvement_loop
 
 def chill_out(text):
     print("Got this input:", text)
-    result: str = improvement_loop(text)
+    result: dict = improvement_loop(text)
     print("Got this result:", result)
-    result: dict = json.loads(result)
 
     formatted_output = f"""
     <div>
