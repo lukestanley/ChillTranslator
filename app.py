@@ -38,32 +38,15 @@ examples = [
     ["Your idea of a balanced diet is a biscuit in each hand."]
 ]
 
-description = """
-# ❄️ ChillTranslator 🤬 ➡️ 😎💬
+description = """This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
 
-This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
-
-ChillTranslator aims to help make online interactions more healthy. 
-It aims to:
-- **Convert** text to less toxic variations
-- **Preserve original intent**, focusing on constructive dialogue
-
+ChillTranslator aims to help make online interactions more healthy, with a tool to **convert** text to less toxic variations, **preserve original intent**, focusing on constructive dialogue.
 The project is on GitHub:
 [https://github.com/lukestanley/ChillTranslator](https://github.com/lukestanley/ChillTranslator)
 The repo is the same repo for the HuggingFace Space, the serverless worker, and the logic.
 
-## Contributing 🤝
-
-Contributions are very welcome!
-Especially:
-- pull requests,
-- free GPU credits
-- LLM API credits / access.
-
-ChillTranslator is released under the MIT License.
-
-Help make the internet a kinder place, one comment at a time.
-Your contribution could make a big difference!
+Contributions are very welcome! Especially pull requests, free API credits.
+Help make the internet a kinder place, one comment at a time. Your contribution could make a big difference!
 """
 
 from chill import improvement_loop
@@ -96,7 +79,7 @@ demo = gr.Interface(
     examples=examples,
     cache_examples=True,
     description=description,
-    title="ChillTranslator",
+    title="❄️ ChillTranslator 🤬 ➡️ 😎💬",
     allow_flagging="never",
 )
 
