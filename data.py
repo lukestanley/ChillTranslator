@@ -11,7 +11,7 @@ def log_to_jsonl(file_path, data):
             raise ValueError("SAVE_URL environment variable not set")
 
         # Serialize the data to a JSON string
-        json_data = json.dumps({"file_path": file_path, "data": data})
+        json_data = [{"file_path": file_path, "data": data}]
 
         # Create a dictionary with the JSON data as the value of a field named "data"
         request_body = {"data": json_data}
