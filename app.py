@@ -38,6 +38,7 @@ examples = [
 ]
 
 description = """This is an early experimental tool aimed at helping reduce online toxicity by automatically ➡️ transforming 🌶️ spicy or toxic comments into constructive, ❤️ kinder dialogues using AI and large language models.
+Input and outputs may be used to train a faster model, by using this, you must agree that the input text is owned by you and that you're okay with it being used to help make an AI model that makes kinder comments!
 
 ChillTranslator aims to help make online interactions more healthy, with a tool to **convert** text to less toxic variations, **preserve original intent**, focusing on constructive dialogue.
 The project is on GitHub:
@@ -46,6 +47,7 @@ The repo is the same repo for the HuggingFace Space, the serverless worker, and 
 
 Contributions are very welcome! Especially pull requests, free API credits.
 Help make the internet a kinder place, one comment at a time. Your contribution could make a big difference!
+Thank you!
 """
 
 from chill import improvement_loop
