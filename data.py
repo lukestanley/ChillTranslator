@@ -34,3 +34,12 @@ def log_to_jsonl(file_path, data):
     # Create a new thread and start it
     thread = threading.Thread(target=_log_to_jsonl)
     thread.start()
+
+# If there is an ENV var called SKIP_NETWORK, we just locally save the data
+
+def local_log_to_jsonl(file_path, data):
+    with open("local_data.jsonl", "a") as f:
+        f.write(json.dumps({"file_path": file_path, "data": data}) + "\n")
+
+if os.environ.get("SKIP_NETWORK") is not None:
+    log_to_jsonl = local_log_to_jsonl
