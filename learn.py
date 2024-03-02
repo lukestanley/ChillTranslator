@@ -64,38 +64,6 @@ def handle_cache(prefix, func, *args, _result=None, **kwargs):
     return _result
 
 
-def acache(prefix):
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            # Generate a key based on function name and arguments
-            key = f"{func.__name__}_{args}_{kwargs}"
-            hashed_key = hashlib.sha1(key.encode()).hexdigest()
-            cache_filename = f"{prefix}_{hashed_key}.json"
-
-            # Check the in-memory cache first
-            if key in _in_memory_cache:
-                return _in_memory_cache[key]
-
-            # Check if cache file exists and read data
-            if os.path.exists(cache_filename):
-                with open(cache_filename, 'r') as file:
-                    _in_memory_cache[key] = json.load(file)
-                    return _in_memory_cache[key]
-
-            # Await the function call and get the result
-            print("Computing result for async function")
-            result = await func(*args, **kwargs)
-
-            # Update the in-memory cache and write it to the file
-            _in_memory_cache[key] = result
-            with open(cache_filename, 'w') as file:
-                json.dump(result, file)
-
-            return result
-
-        return wrapper
-    return decorator
 
 
 def cache(prefix):
@@ -107,27 +75,6 @@ def cache(prefix):
         return wrapper
     return decorator
 
-def timeit(func):
-    @wraps(func)
-    async def async_wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = await func(*args, **kwargs)  # Awaiting the async function
-        end_time = time.time()
-        print(f"{func.__name__} took {end_time - start_time:.1f} seconds to run.")
-        return result
-
-    @wraps(func)
-    def sync_wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)  # Calling the sync function
-        end_time = time.time()
-        print(f"{func.__name__} took {end_time - start_time:.1f} seconds to run.")
-        return result
-
-    if asyncio.iscoroutinefunction(func):
-        return async_wrapper
-    else:
-        return sync_wrapper
 
 
 
