@@ -1,7 +1,18 @@
 # %%
+import asyncio
+import json
+import time
+import os
+import hashlib
+from functools import wraps
+
 import pandas as pd
 from datasets import load_dataset
 from detoxify import Detoxify
+
+# TODO: Compare OpenAI's moderation API to Detoxify
+
+
 predict_model = Detoxify('original-small')
 dataset = load_dataset("tasksource/jigsaw")
 
@@ -20,13 +31,6 @@ predict_model.predict("You suck, that is not Markdown!") # Also accepts an array
  'insult': 0.7787105,
  'identity_attack': 0.007936229}
 
-# %%
-import asyncio
-import json
-import time
-import os
-import hashlib
-from functools import wraps
 
 
 _in_memory_cache = {}
@@ -127,7 +131,6 @@ def timeit(func):
 
 
 
-# %%
 
 @cache("toxicity")
 def cached_toxicity_prediction(comments):
