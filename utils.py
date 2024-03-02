@@ -190,7 +190,7 @@ def llm_stream_serverless(prompt,model):
 LAST_REQUEST_TIME = None
 REQUEST_INTERVAL = 0.5  # Minimum time interval between requests in seconds
 
-def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict[str, Any]]:
+def llm_stream_mistral_api(prompt: str, pydantic_model_class=None, attempts=0) -> Union[str, Dict[str, Any]]:
     global LAST_REQUEST_TIME
     current_time = time()
     if LAST_REQUEST_TIME is not None:
@@ -227,10 +227,24 @@ def llm_stream_mistral_api(prompt: str, pydantic_model_class) -> Union[str, Dict
     print(result)
     output = result['choices'][0]['message']['content']
     if pydantic_model_class:
-        parsed_result = pydantic_model_class.model_validate_json(output)
-        print(parsed_result)
-        # This will raise an exception if the model is invalid,
-        # TODO: handle exception with retry logic
+        # TODO: Use more robust error handling that works for all cases without retrying?
+        # Maybe APIs that dont have grammar should be avoided?
+        # Investigate grammar enforcement with open ended generations?
+        try:
+            parsed_result = pydantic_model_class.model_validate_json(output)
+            print(parsed_result)
+            # This will raise an exception if the model is invalid,
+        except Exception as e:
+            print(f"Error validating pydantic model: {e}")
+            # Let's retry by calling ourselves again if attempts < 3
+            if attempts == 0:
+                # We modify the prompt to remind it to output JSON in the required format
+                prompt = f"{prompt} You must output the JSON in the required format!"
+            if attempts < 3:
+                attempts += 1
+                print(f"Retrying Mistral API call, attempt {attempts}")
+                return llm_stream_mistral_api(prompt, pydantic_model_class, attempts)
+
     else:
         print("No pydantic model class provided, returning without class validation")
     return json.loads(output)
