@@ -36,7 +36,7 @@ LLM_MODEL_PATH = env.get("LLM_MODEL_PATH", None)
 MAX_TOKENS = int(env.get("MAX_TOKENS", 1000))
 TEMPERATURE = float(env.get("TEMPERATURE", 0.3))
 
-performing_local_inference = (LLM_WORKER == "in_memory" or LLM_WORKER == "http")
+performing_local_inference = (LLM_WORKER == "in_memory" or (LLM_WORKER == "http" and "localhost" in URL))
 
 if LLM_MODEL_PATH and len(LLM_MODEL_PATH) > 0:
     print(f"Using local model from {LLM_MODEL_PATH}")
