@@ -24,9 +24,9 @@ from huggingface_hub import hf_hub_download
 
 URL = "http://localhost:5834/v1/chat/completions"
 in_memory_llm = None
-worker_options = ["runpod", "http", "in_memory", "mistral"]
+worker_options = ["runpod", "http", "in_memory", "mistral", "anthropic"]
 
-LLM_WORKER = env.get("LLM_WORKER", "mistral")
+LLM_WORKER = env.get("LLM_WORKER", "anthropic")
 if LLM_WORKER not in worker_options:
     raise ValueError(f"Invalid worker: {LLM_WORKER}")
 N_GPU_LAYERS = int(env.get("N_GPU_LAYERS", -1)) # Default to -1, use all layers if available
@@ -250,11 +250,62 @@ def llm_stream_mistral_api(prompt: str, pydantic_model_class=None, attempts=0) -
     return json.loads(output)
 
 
+def send_anthropic_request(prompt: str):
+    api_key = env.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        print("API key not found. Please set the ANTHROPIC_API_KEY environment variable.")
+        return
+
+    headers = {
+        'x-api-key': api_key,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+    }
+
+    data = {
+        "model": "claude-3-opus-20240229",
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": prompt}]
+    }
+
+    response = requests.post('https://api.anthropic.com/v1/messages', headers=headers, data=json.dumps(data))
+    if response.status_code != 200:
+        print(f"Unexpected Anthropic API status code: {response.status_code} with body: {response.text}")
+        raise ValueError(f"Unexpected Anthropic API status code: {response.status_code} with body: {response.text}")
+    j = response.json()
+    
+    text = j['content'][0]["text"]
+    print(text)
+    return text
+
+def llm_anthropic_api(prompt: str, pydantic_model_class=None, attempts=0) -> Union[str, Dict[str, Any]]:
+    # With no streaming or rate limits, we use the Anthropic API, we have string input and output from send_anthropic_request,
+    # but we need to convert it to JSON for the pydantic model class like the other APIs.
+    output = send_anthropic_request(prompt)
+    if pydantic_model_class:
+        try:
+            parsed_result = pydantic_model_class.model_validate_json(output)
+            print(parsed_result)
+            # This will raise an exception if the model is invalid.
+            return json.loads(output)
+        except Exception as e:
+            print(f"Error validating pydantic model: {e}")
+            # Let's retry by calling ourselves again if attempts < 3
+            if attempts == 0:
+                # We modify the prompt to remind it to output JSON in the required format
+                prompt = f"{prompt} You must output the JSON in the required format only, with no remarks or prefacing remarks - JUST JSON!"
+            if attempts < 3:
+                attempts += 1
+                print(f"Retrying Anthropic API call, attempt {attempts}")
+                return llm_anthropic_api(prompt, pydantic_model_class, attempts)
+    else:
+        print("No pydantic model class provided, returning without class validation")
+        return json.loads(output)
 
 def query_ai_prompt(prompt, replacements, model_class):
     prompt = replace_text(prompt, replacements)
-    if LLM_WORKER == "mistral":
-        result = llm_stream_mistral_api(prompt, model_class)
+    if LLM_WORKER == "anthropic":
+        result = llm_anthropic_api(prompt, model_class)
     if LLM_WORKER == "mistral":
         result = llm_stream_mistral_api(prompt, model_class)
     if LLM_WORKER == "runpod":
