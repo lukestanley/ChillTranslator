@@ -59,7 +59,7 @@ def improve_text_attempt():
     }
     request_count += 1
     resp_json = query_ai_prompt(improve_prompt, replacements, ImprovedText)
-    return resp_json["text"]
+    return resp_json["best"]
 
 
 def critique_text(last_edit):
