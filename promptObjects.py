@@ -1,23 +1,23 @@
 from pydantic import BaseModel, Field
 
 improve_prompt = """
-Your task is to rephrase inflammatory text, so it is more calm and constructive, without changing the intended meaning.
-The improved text should have a softened tone, avoiding judgemental and extreme words.
+Given some inflammatory text, make minimal changes to the text to make it less inflammatory, while keeping the original meaning as much as possible.
+Make the new version more calm and constructive, without changing the intended meaning, with only minimal changes to the existing text.
 Make sure the refined text is a good reflection of the original text, without adding new ideas.
+Make the changes as minimal as possible. Some optional strategies to make the text less inflammatory include:
+-Soften harsh tone, replace or omit judgemental or extreme words.
+-Rather than accusations, share perspective.
+-Consider focusing on specific actions rather than character.
+-Rephrasing exaggerated expressions like "always", "never" or "everyone" to be more moderate.
+-Using gentler alternatives to express similar points where needed.
 
-1. Rather than accusations, share perspective.
-2. Remove or soften judgemental language.
-3. Focus on specific actions rather than character.
-4. Rephrase extreme words like "always", "never" or "everyone" to be more moderate.
-5. Focus on softening the tone, rather than changing the substance or meaning.
-6. Use gentler alternatives to express similar points.
-7. Don't add completely new ideas, ONLY build upon what's already there.
-8 For example, you might reframe an existing point to be more balanced. Never introduce unrelated concepts.
-9. Make everyone happy! Make them INFORMED and not *offended*. Make the original author to *content* that their points where *honoured* by your edit, by refining their text without loosing the original intent.
+Avoid adding new ideas, ONLY build upon what's already there, for example, you might reframe an existing point to be more balanced but never introduce unrelated concepts.
+Make both parties more happy where possible:
+The reader should be INFORMED and not *offended*, and the original author should be *content* that their points where *honoured* by your edit, by minimally refining their text without loosing the original intent.
 
 Example:
 Example input text: "You're always annoying me. You never listen to me."
-Example improved text output: {"text":"I am frustrated by your behaviour. Could you listen to me better?"}
+Example improved text output: {"text":"You're often frustrating me. It feels like you often don't listen to me."}
 
 End of example.
 Here is the real input text to improve:
@@ -50,7 +50,8 @@ E.g:
 {
     "critique":"This is too fluffy and different from the original intent."
 }
-Please critique the text."""
+Please critique the text.
+You must output the JSON in the required format only, with no remarks or prefacing remarks - JUST JSON!"""
 
 
 spicy_scorer_prompt = """
@@ -70,6 +71,7 @@ Output your response as valid JSON in this format, then stop:
     "spicy_score":FLOAT
 }
 Please score the text.
+You must output the JSON in the required format only, with no remarks or prefacing remarks - JUST JSON!
 """
 
 
@@ -91,6 +93,7 @@ Output your response as valid JSON in this format, then stop:
     "faithfulness_score":FLOAT
 }
 Please score the text.
+You must output the JSON in the required format only, with no remarks or prefacing remarks - JUST JSON!
 """
 
 
