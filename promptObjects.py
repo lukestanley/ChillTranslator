@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel, Field
 
 improve_prompt = """
@@ -12,13 +13,26 @@ Make the changes as minimal as possible. Some optional strategies to make the te
 -Using gentler alternatives to express similar points where needed.
 
 Avoid adding new ideas, ONLY build upon what's already there, for example, you might reframe an existing point to be more balanced but never introduce unrelated concepts.
+
 Make both parties more happy where possible:
 The reader should be INFORMED and not *offended*, and the original author should be *content* that their points where *honoured* by your edit, by minimally refining their text without loosing the original intent.
 
-Example:
-Example input text: "You're always annoying me. You never listen to me."
-Example improved text output: {"text":"You're often frustrating me. It feels like you often don't listen to me."}
+Format:
+JSON object with the following properties:
+worst_terms: array of strings of the worst terms in the text
+worst_fix: Text with worst terms replaced or softened
+nvc: text with Non-violent Communication perspective sharing where needed
+constructive: text with constructive suggestions
+hybrid: The most minimal calm variation of the original text, learning from prior variations
 
+Example input text: "You're always annoying me. You never listen to me."
+Example improved text outputs: 
+{
+ "worst_terms": ["annoying", "always annoying", "never listen"],
+ "worst_fix": "You're often frustrating me. You rarely listen to me.",
+ "perspective": "I often feel annoyed by you. I rarely feel you listen to me.",
+ "constructive": "I often feel frustrated by you. I rarely feel you listen to me. How can we improve our communication?",
+ "hybrid": "You're often frustrating me. It feels like you often don't listen to me."}
 End of example.
 Here is the real input text to improve:
 `{original_text}`
@@ -26,9 +40,10 @@ Here is the real input text to improve:
 Previous rephrasing attempts:
 {previous_suggestions}
 
-Provide your improved version in this format:
-{"text":"STRING"}
-To get a good answer, make the original text non-inflamitory, while being as faithful to the ideas in the original text as much as possible. Use valid JSON then stop, do not add any remarks before or after the JSON.
+Provide your improved version in the required JSON format.
+To get a good answer, make the original text non-inflamitory, while being as faithful to the original text as much as possible. 
+Use valid JSON then stop, the required keys are: worst_terms, worst_fix, nvc, constructive, best.
+Do not add any remarks before or after the JSON!
 """
 
 critique_prompt = """
@@ -98,18 +113,22 @@ You must output the JSON in the required format only, with no remarks or prefaci
 
 
 class ImprovedText(BaseModel):
-    text: str = Field(str, description="The improved text.")
+    worst_terms: List[str] = Field(..., description="Array of strings of the worst terms in the text.")
+    worst_fix: str = Field(..., description="The text with worst terms replaced or softened.")
+    nvc: str = Field(..., description="The text with NVC perspective sharing where needed.")
+    constructive: str = Field(..., description="The text with constructive suggestions.")
+    hybrid: str = Field(..., description="A suggestion that each try to be close to the original while combining best of the variations")
 
 
 class SpicyScore(BaseModel):
-    spicy_score: float = Field(float, description="The spiciness score of the text.")
+    spicy_score: float = Field(..., description="The spiciness score of the text.")
 
 
 class Critique(BaseModel):
-    critique: str = Field(str, description="The critique of the text.")
+    critique: str = Field(..., description="The critique of the text.")
 
 
 class FaithfulnessScore(BaseModel):
     faithfulness_score: float = Field(
-        float, description="The faithfulness score of the text."
+        ..., description="The faithfulness score of the text."
     )

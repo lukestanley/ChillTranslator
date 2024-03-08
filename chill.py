@@ -42,43 +42,43 @@ Outputs something like this:
 }
 """
 
-global suggestions
-suggestions = []
-last_edit = ""
-request_count = 0
 
 
-def query_ai_prompt_with_count(prompt, replacements, model_class):
-    global request_count
-    request_count += 1
+class ImprovementContext:
+    def __init__(self, original_text=None):
+        self.suggestions = []
+        self.last_edit = ""
+        self.request_count = 0
+        self.start_time = time.time()
+        self.original_text = original_text
+
+def query_ai_prompt_with_count(prompt, replacements, model_class, context):
+    context.request_count += 1
     return query_ai_prompt(prompt, replacements, model_class)
 
 
-start_time = None
 
 
-def improve_text_attempt():
-    global suggestions
+def improve_text_attempt(context):
     replacements = {
-        "original_text": json.dumps(original_text),
-        "previous_suggestions": json.dumps(suggestions, indent=2),
+        "original_text": json.dumps(context.original_text),
+        "previous_suggestions": json.dumps(context.suggestions, indent=2),
     }
-    resp_json = query_ai_prompt_with_count(improve_prompt, replacements, ImprovedText)
-    return resp_json["text"]
+    resp_json = query_ai_prompt_with_count(improve_prompt, replacements, ImprovedText, context)
+    return resp_json["hybrid"]
 
 
-def critique_text(last_edit):
-    global suggestions
-    replacements = {"original_text": original_text, "last_edit": last_edit}
+def critique_text(context):
+    replacements = {"original_text": context.original_text, "last_edit": context.last_edit}
 
     # Query the AI for each of the new prompts separately
 
-    critique_resp = query_ai_prompt_with_count(critique_prompt, replacements, Critique)
+    critique_resp = query_ai_prompt_with_count(critique_prompt, replacements, Critique, context)
     faithfulness_resp = query_ai_prompt_with_count(
-        faith_scorer_prompt, replacements, FaithfulnessScore
+        faith_scorer_prompt, replacements, FaithfulnessScore, context
     )
     spiciness_resp = query_ai_prompt_with_count(
-        spicy_scorer_prompt, replacements, SpicyScore
+        spicy_scorer_prompt, replacements, SpicyScore, context
     )
 
     # Combine the results from the three queries into a single dictionary
@@ -91,7 +91,7 @@ def critique_text(last_edit):
     return combined_resp
 
 
-def update_suggestions(critique_dict, iteration):
+def update_suggestions(critique_dict, iteration, context):
     """
     Gets weighted score for new suggestion,
     adds new suggestion,
@@ -99,29 +99,25 @@ def update_suggestions(critique_dict, iteration):
     updates request_count, time_used,
     log progress and return highest score
     """
-    global suggestions
-    global time_used
-    global iteration_count
-    iteration_count = iteration
-    time_used = time.time() - start_time
+    context.iteration = iteration
+    time_used = time.time() - context.start_time
     critique_dict["overall_score"] = round(
         calculate_overall_score(
             critique_dict["faithfulness_score"], critique_dict["spicy_score"]
         ),
         2,
     )
-    critique_dict["edit"] = last_edit
-    suggestions.append(critique_dict)
-    suggestions = sorted(suggestions, key=lambda x: x["overall_score"], reverse=True)[
+    critique_dict["edit"] = context.last_edit
+    context.suggestions.append(critique_dict)
+    context.suggestions = sorted(context.suggestions, key=lambda x: x["overall_score"], reverse=True)[
         :2
     ]
-    critique_dict["request_count"] = request_count
-    print_iteration_result(iteration_count, critique_dict["overall_score"], time_used)
+    critique_dict["request_count"] = context.request_count
+    print_iteration_result(context.iteration, critique_dict["overall_score"], time_used, context.suggestions)
     return critique_dict["overall_score"]
 
 
-def print_iteration_result(iteration, overall_score, time_used):
-    global suggestions
+def print_iteration_result(iteration, overall_score, time_used, suggestions):
     print(
         f"Iteration {iteration}: overall_score={overall_score:.2f}, time_used={time_used:.2f} seconds."
     )
@@ -129,49 +125,43 @@ def print_iteration_result(iteration, overall_score, time_used):
     print(json.dumps(suggestions, indent=2))
 
 
-def done_log():
+def done_log(context):
     log_entry = {
         "uuid": str(uuid.uuid4()),
         "timestamp": datetime.utcnow().isoformat(),
-        "input": original_text,
-        "output": suggestions[0],
+        "input": context.original_text,
+        "output": context.suggestions[0],
     }
     log_to_jsonl("inputs_and_outputs.jsonl", log_entry)
 
 
 def improvement_loop(
     input_text,
+    context = ImprovementContext(),
     max_iterations=3,
     good_score=0.85,
     min_iterations=2,
     good_score_if_late=0.7,
     deadline_seconds=60,
 ):
-    global original_text
-    global last_edit
-    global suggestions
-    global request_count
-    global start_time
-    suggestions = []
-    last_edit = ""
-    request_count = 0
-    start_time = time.time()
-    original_text = input_text
+    context.original_text = input_text
+    time_used = 0
 
     for iteration in range(1, max_iterations + 1):
-        last_edit = improve_text_attempt()
-        critique_dict = critique_text(last_edit)
-        overall_score = update_suggestions(critique_dict, iteration)
+        context.last_edit = improve_text_attempt(context)
+        critique_dict = critique_text(context)
+        overall_score = update_suggestions(critique_dict, iteration, context)
         good_attempt = iteration >= min_iterations and overall_score >= good_score
+        time_used = time.time() - context.start_time
         too_long = time_used > deadline_seconds and overall_score >= good_score_if_late
         if good_attempt or too_long:
             break
 
-    assert len(suggestions) > 0
-    print("Stopping\nTop suggestion:\n", json.dumps(suggestions[0], indent=4))
-    suggestions[0].update({"iteration_count": iteration, "max_allowed_iterations": max_iterations, "time_used": time_used})
-    done_log()
-    return suggestions[0]
+    assert len(context.suggestions) > 0
+    print("Stopping\nTop suggestion:\n", json.dumps(context.suggestions[0], indent=4))
+    context.suggestions[0].update({"iteration_count": iteration, "max_allowed_iterations": max_iterations, "time_used": time_used})
+    done_log(context)
+    return context.suggestions[0]
 
 
 if __name__ == "__main__":
@@ -180,7 +170,7 @@ if __name__ == "__main__":
         "-t", "--text", type=str, help="Text to be improved", default=original_text
     )
     args = parser.parse_args()
-
+    
     improvement_loop(args.text)
 # TODO: Segment the text into sentences for parallel processing, and isolate the most problematic parts for improvement
 """
