@@ -46,34 +46,40 @@ global suggestions
 suggestions = []
 last_edit = ""
 request_count = 0
+
+
+def query_ai_prompt_with_count(prompt, replacements, model_class):
+    global request_count
+    request_count += 1
+    return query_ai_prompt(prompt, replacements, model_class)
+
+
 start_time = None
 
 
 def improve_text_attempt():
     global suggestions
-    global request_count
     replacements = {
         "original_text": json.dumps(original_text),
         "previous_suggestions": json.dumps(suggestions, indent=2),
     }
-    request_count += 1
-    resp_json = query_ai_prompt(improve_prompt, replacements, ImprovedText)
+    resp_json = query_ai_prompt_with_count(improve_prompt, replacements, ImprovedText)
     return resp_json["text"]
 
 
 def critique_text(last_edit):
     global suggestions
-    global request_count
     replacements = {"original_text": original_text, "last_edit": last_edit}
 
     # Query the AI for each of the new prompts separately
 
-    request_count += 3
-    critique_resp = query_ai_prompt(critique_prompt, replacements, Critique)
-    faithfulness_resp = query_ai_prompt(
+    critique_resp = query_ai_prompt_with_count(critique_prompt, replacements, Critique)
+    faithfulness_resp = query_ai_prompt_with_count(
         faith_scorer_prompt, replacements, FaithfulnessScore
     )
-    spiciness_resp = query_ai_prompt(spicy_scorer_prompt, replacements, SpicyScore)
+    spiciness_resp = query_ai_prompt_with_count(
+        spicy_scorer_prompt, replacements, SpicyScore
+    )
 
     # Combine the results from the three queries into a single dictionary
     combined_resp = {
@@ -87,7 +93,7 @@ def critique_text(last_edit):
 
 def update_suggestions(critique_dict, iteration):
     """
-    Gets weighted score for new suggestion, 
+    Gets weighted score for new suggestion,
     adds new suggestion,
     sorts suggestions by score,
     updates request_count, time_used,
@@ -123,7 +129,24 @@ def print_iteration_result(iteration, overall_score, time_used):
     print(json.dumps(suggestions, indent=2))
 
 
-def improvement_loop(input_text, max_iterations=3, good_score=0.85, min_iterations=2, good_score_if_late=0.7, deadline_seconds=60):
+def done_log():
+    log_entry = {
+        "uuid": str(uuid.uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "input": original_text,
+        "output": suggestions[0],
+    }
+    log_to_jsonl("inputs_and_outputs.jsonl", log_entry)
+
+
+def improvement_loop(
+    input_text,
+    max_iterations=3,
+    good_score=0.85,
+    min_iterations=2,
+    good_score_if_late=0.7,
+    deadline_seconds=60,
+):
     global original_text
     global last_edit
     global suggestions
@@ -143,17 +166,11 @@ def improvement_loop(input_text, max_iterations=3, good_score=0.85, min_iteratio
         too_long = time_used > deadline_seconds and overall_score >= good_score_if_late
         if good_attempt or too_long:
             break
-    
+
     assert len(suggestions) > 0
     print("Stopping\nTop suggestion:\n", json.dumps(suggestions[0], indent=4))
     suggestions[0].update({"iteration_count": iteration, "max_allowed_iterations": max_iterations, "time_used": time_used})
-    log_entry = {
-        "uuid": str(uuid.uuid4()),
-        "timestamp": datetime.utcnow().isoformat(),
-        "input": original_text,
-        "output": suggestions[0],
-    }
-    log_to_jsonl("inputs_and_outputs.jsonl", log_entry)
+    done_log()
     return suggestions[0]
 
 
