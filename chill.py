@@ -1,8 +1,8 @@
 # chill.py
-import argparse
+from argparse import ArgumentParser
 import json
-import time
-import uuid
+from time import time
+from uuid import uuid4
 from data import log_to_jsonl
 from datetime import datetime
 from utils import calculate_overall_score, query_ai_prompt
@@ -49,7 +49,7 @@ class ImprovementContext:
         self.suggestions = []
         self.last_edit = ""
         self.request_count = 0
-        self.start_time = time.time()
+        self.start_time = time()
         self.original_text = original_text
 
 def query_ai_prompt_with_count(prompt, replacements, model_class, context):
@@ -100,7 +100,7 @@ def update_suggestions(critique_dict, iteration, context):
     log progress and return highest score
     """
     context.iteration = iteration
-    time_used = time.time() - context.start_time
+    time_used = time() - context.start_time
     critique_dict["overall_score"] = round(
         calculate_overall_score(
             critique_dict["faithfulness_score"], critique_dict["spicy_score"]
@@ -127,7 +127,7 @@ def print_iteration_result(iteration, overall_score, time_used, suggestions):
 
 def done_log(context):
     log_entry = {
-        "uuid": str(uuid.uuid4()),
+        "uuid": str(uuid4()),
         "timestamp": datetime.utcnow().isoformat(),
         "input": context.original_text,
         "output": context.suggestions[0],
@@ -152,7 +152,7 @@ def improvement_loop(
         critique_dict = critique_text(context)
         overall_score = update_suggestions(critique_dict, iteration, context)
         good_attempt = iteration >= min_iterations and overall_score >= good_score
-        time_used = time.time() - context.start_time
+        time_used = time() - context.start_time
         too_long = time_used > deadline_seconds and overall_score >= good_score_if_late
         if good_attempt or too_long:
             break
@@ -165,13 +165,14 @@ def improvement_loop(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process and improve text.")
+    parser = ArgumentParser(description="Process and improve text.")
     parser.add_argument(
         "-t", "--text", type=str, help="Text to be improved", default=original_text
     )
     args = parser.parse_args()
-    
+
     improvement_loop(args.text)
+
 # TODO: Segment the text into sentences for parallel processing, and isolate the most problematic parts for improvement
 """
 # import pysbd
