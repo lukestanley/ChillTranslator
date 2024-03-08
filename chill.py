@@ -119,7 +119,8 @@ def update_suggestions(critique_dict, iteration, context):
         :2
     ]
     critique_dict["request_count"] = context.request_count
-    print_iteration_result(context.iteration, critique_dict["overall_score"], time_used, context.suggestions)
+    if context.verbose:
+        print_iteration_result(context.iteration, critique_dict["overall_score"], time_used, context.suggestions)
     return critique_dict["overall_score"]
 
 
@@ -143,14 +144,16 @@ def done_log(context):
 
 def improvement_loop(
     input_text,
-    context = ImprovementContext(),
     max_iterations=3,
     good_score=0.85,
     min_iterations=2,
     good_score_if_late=0.7,
     deadline_seconds=60,
+    verbose=True,
 ):
+    context = ImprovementContext()
     context.original_text = input_text
+    context.verbose = verbose
     time_used = 0
 
     for iteration in range(1, max_iterations + 1):
@@ -165,7 +168,7 @@ def improvement_loop(
             break
 
     assert len(context.suggestions) > 0
-    print("Stopping\nTop suggestion:\n", json.dumps(context.suggestions[0], indent=4))
+    if verbose: print("Stopping\nTop suggestion:\n", json.dumps(context.suggestions[0], indent=4))
     context.suggestions[0].update({
         "input": context.original_text,
         "iteration_count": iteration, 
