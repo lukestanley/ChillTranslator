@@ -1,3 +1,4 @@
+# chill.py
 import argparse
 import json
 import time
@@ -48,8 +49,6 @@ request_count = 0
 start_time = None
 
 
-
-
 def improve_text_attempt():
     global suggestions
     global request_count
@@ -86,19 +85,6 @@ def critique_text(last_edit):
     return combined_resp
 
 
-def should_stop(
-    iteration,
-    overall_score,
-    time_used,
-    min_iterations=2,
-    min_overall_score=0.85,
-    max_seconds=60,
-):
-    good_attempt = iteration >= min_iterations and overall_score >= min_overall_score
-    too_long = time_used > max_seconds and overall_score >= 0.7
-    return good_attempt or too_long
-
-
 def update_suggestions(critique_dict):
     global suggestions
     critique_dict["overall_score"] = round(
@@ -124,7 +110,7 @@ def print_iteration_result(iteration, overall_score, time_used):
     print(json.dumps(suggestions, indent=2))
 
 
-def improvement_loop(input_text):
+def improvement_loop(input_text, max_iterations=3, good_score=0.85, min_iterations=2, good_score_if_late=0.7, deadline_seconds=60):
     global original_text
     global last_edit
     global suggestions
@@ -135,53 +121,40 @@ def improvement_loop(input_text):
     last_edit = ""
     request_count = 0
     start_time = time.time()
-    max_iterations = 6
     original_text = input_text
-
     for iteration in range(1, max_iterations + 1):
         iteration_count = iteration
-        try:
-            if iteration % 2 == 1:
-                last_edit = improve_text_attempt()
-            else:
-                critique_dict = critique_text(last_edit)
-                update_suggestions(critique_dict)
-                overall_score = critique_dict["overall_score"]
-                time_used = time.time() - start_time
-
-                print_iteration_result(iteration, overall_score, time_used)
-
-                if should_stop(iteration, overall_score, time_used):
-                    print(
-                        "Stopping\nTop suggestion:\n",
-                        json.dumps(suggestions[0], indent=4),
-                    )
-                    break
-        except ValueError as e:
-            print("ValueError:", e)
-            continue
+        last_edit = improve_text_attempt()
+        critique_dict = critique_text(last_edit)
+        update_suggestions(critique_dict)
+        overall_score = critique_dict["overall_score"]
+        time_used = time.time() - start_time
+        print_iteration_result(iteration, overall_score, time_used)
+        good_attempt = iteration >= min_iterations and overall_score >= good_score
+        too_long = time_used > deadline_seconds and overall_score >= good_score_if_late
+        if good_attempt or too_long:
+            break
     assert len(suggestions) > 0
-    suggestions[0]["iteration_count"] = iteration_count
-    suggestions[0]["max_allowed_iterations"] = max_iterations
-    suggestions[0]["time_used"] = time_used
+    print("Stopping\nTop suggestion:\n", json.dumps(suggestions[0], indent=4))
+    suggestions[0].update({"iteration_count": iteration_count, "max_allowed_iterations": max_iterations, "time_used": time_used})
     log_entry = {
         "uuid": str(uuid.uuid4()),
         "timestamp": datetime.utcnow().isoformat(),
         "input": original_text,
-        "output": suggestions[0]
+        "output": suggestions[0],
     }
-    log_to_jsonl('inputs_and_outputs.jsonl', log_entry)
+    log_to_jsonl("inputs_and_outputs.jsonl", log_entry)
     return suggestions[0]
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process and improve text.")
-    parser.add_argument("-t", "--text", type=str, help="Text to be improved", default=original_text)
+    parser.add_argument(
+        "-t", "--text", type=str, help="Text to be improved", default=original_text
+    )
     args = parser.parse_args()
 
     improvement_loop(args.text)
-
-
 # TODO: Segment the text into sentences for parallel processing, and isolate the most problematic parts for improvement
 """
 # import pysbd
