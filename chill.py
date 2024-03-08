@@ -51,6 +51,7 @@ class ImprovementContext:
         self.request_count = 0
         self.start_time = time()
         self.original_text = original_text
+        self.improvement_result  = dict()
 
 def query_ai_prompt_with_count(prompt, replacements, model_class, context):
     context.request_count += 1
@@ -64,8 +65,7 @@ def improve_text_attempt(context):
         "original_text": json.dumps(context.original_text),
         "previous_suggestions": json.dumps(context.suggestions, indent=2),
     }
-    resp_json = query_ai_prompt_with_count(improve_prompt, replacements, ImprovedText, context)
-    return resp_json["hybrid"]
+    return query_ai_prompt_with_count(improve_prompt, replacements, ImprovedText, context)
 
 
 def critique_text(context):
@@ -108,6 +108,12 @@ def update_suggestions(critique_dict, iteration, context):
         2,
     )
     critique_dict["edit"] = context.last_edit
+    if "worst_fix" in context.improvement_result:
+        critique_dict["worst_fix"] = context.improvement_result["worst_fix"]
+    if "nvc" in context.improvement_result:
+        critique_dict["perspective"] = context.improvement_result["nvc"]
+    if "constructive" in context.improvement_result:
+        critique_dict["constructive"] = context.improvement_result["constructive"]
     context.suggestions.append(critique_dict)
     context.suggestions = sorted(context.suggestions, key=lambda x: x["overall_score"], reverse=True)[
         :2
@@ -148,7 +154,8 @@ def improvement_loop(
     time_used = 0
 
     for iteration in range(1, max_iterations + 1):
-        context.last_edit = improve_text_attempt(context)
+        context.improvement_result = improve_text_attempt(context)
+        context.last_edit = context.improvement_result["hybrid"]
         critique_dict = critique_text(context)
         overall_score = update_suggestions(critique_dict, iteration, context)
         good_attempt = iteration >= min_iterations and overall_score >= good_score
@@ -159,7 +166,16 @@ def improvement_loop(
 
     assert len(context.suggestions) > 0
     print("Stopping\nTop suggestion:\n", json.dumps(context.suggestions[0], indent=4))
-    context.suggestions[0].update({"iteration_count": iteration, "max_allowed_iterations": max_iterations, "time_used": time_used})
+    context.suggestions[0].update({
+        "input": context.original_text,
+        "iteration_count": iteration, 
+        "max_allowed_iterations": max_iterations, 
+        "time_used": time_used,
+        "worst_terms": context.improvement_result.get("worst_terms", ""),
+        "worst_fix": context.improvement_result.get("worst_fix", ""),
+        "perspective": context.improvement_result.get("nvc", ""),
+        "constructive": context.improvement_result.get("constructive", "")
+    })
     done_log(context)
     return context.suggestions[0]
 
