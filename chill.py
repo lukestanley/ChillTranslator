@@ -85,8 +85,19 @@ def critique_text(last_edit):
     return combined_resp
 
 
-def update_suggestions(critique_dict):
+def update_suggestions(critique_dict, iteration):
+    """
+    Gets weighted score for new suggestion, 
+    adds new suggestion,
+    sorts suggestions by score,
+    updates request_count, time_used,
+    log progress and return highest score
+    """
     global suggestions
+    global time_used
+    global iteration_count
+    iteration_count = iteration
+    time_used = time.time() - start_time
     critique_dict["overall_score"] = round(
         calculate_overall_score(
             critique_dict["faithfulness_score"], critique_dict["spicy_score"]
@@ -99,6 +110,8 @@ def update_suggestions(critique_dict):
         :2
     ]
     critique_dict["request_count"] = request_count
+    print_iteration_result(iteration_count, critique_dict["overall_score"], time_used)
+    return critique_dict["overall_score"]
 
 
 def print_iteration_result(iteration, overall_score, time_used):
@@ -116,27 +129,24 @@ def improvement_loop(input_text, max_iterations=3, good_score=0.85, min_iteratio
     global suggestions
     global request_count
     global start_time
-    iteration_count = 0
     suggestions = []
     last_edit = ""
     request_count = 0
     start_time = time.time()
     original_text = input_text
+
     for iteration in range(1, max_iterations + 1):
-        iteration_count = iteration
         last_edit = improve_text_attempt()
         critique_dict = critique_text(last_edit)
-        update_suggestions(critique_dict)
-        overall_score = critique_dict["overall_score"]
-        time_used = time.time() - start_time
-        print_iteration_result(iteration, overall_score, time_used)
+        overall_score = update_suggestions(critique_dict, iteration)
         good_attempt = iteration >= min_iterations and overall_score >= good_score
         too_long = time_used > deadline_seconds and overall_score >= good_score_if_late
         if good_attempt or too_long:
             break
+    
     assert len(suggestions) > 0
     print("Stopping\nTop suggestion:\n", json.dumps(suggestions[0], indent=4))
-    suggestions[0].update({"iteration_count": iteration_count, "max_allowed_iterations": max_iterations, "time_used": time_used})
+    suggestions[0].update({"iteration_count": iteration, "max_allowed_iterations": max_iterations, "time_used": time_used})
     log_entry = {
         "uuid": str(uuid.uuid4()),
         "timestamp": datetime.utcnow().isoformat(),
