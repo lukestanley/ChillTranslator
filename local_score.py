@@ -53,7 +53,7 @@ print("Replacements found:", replacements)
 # Function to calculate an aggregate score for each variant
 def calculate_aggregate_score(overall_similarity, negativity_score, sentiment_delta, edit_distance, max_length, name, sentiment):
     negativity_weight=3
-    sentiment_weight=1
+    sentiment_weight=0.6
     edit_distance_weight=1
     similarity_weight=0.8
     
@@ -123,7 +123,7 @@ Example output:
 Replacements found: {'advertising hellscape': 'advertising-heavy environment', 'biggest crock of crap': 'most bothersome thing', 'never voluntarily use': 'avoid using', 'ever again.': 'in the future.'}
 
 Variation: beta
-Aggregate score: 0.6764
+Aggregate score: 0.6218
 Negativity score: 0.0001
 Sentiment: 0.1366
 Sentiment delta: 0.0428
@@ -131,17 +131,8 @@ Edit distance: 29
 Variant text: `We live in an advertising-heavy landscape now. The biggest frustration is being forced to watch an advertisement at the gas station as I pump my gas. I'll never voluntarily use those pumps ever again.`
 
 
-Variation: constructive
-Aggregate score: 0.5169
-Negativity score: 0.0001
-Sentiment: 0.6391
-Sentiment delta: 0.5454
-Edit distance: 174
-Variant text: `The prevalence of advertising in our environment can feel overwhelming at times. Having to watch ads while pumping gas is particularly bothersome to me. I would appreciate less adverts at gas stations for a less distracting, peaceful experience.`
-
-
 Variation: worst_fix
-Aggregate score: 0.4461
+Aggregate score: 0.4016
 Negativity score: 0.0002
 Sentiment: 0.1111
 Sentiment delta: 0.0174
@@ -149,8 +140,17 @@ Edit distance: 72
 Variant text: `We live in an advertising-heavy environment now. The most bothersome thing is being forced to watch an advertisement at the gas station as I pump my gas. I'll avoid using those pumps in the future.`
 
 
+Variation: constructive
+Aggregate score: 0.2612
+Negativity score: 0.0001
+Sentiment: 0.6391
+Sentiment delta: 0.5454
+Edit distance: 174
+Variant text: `The prevalence of advertising in our environment can feel overwhelming at times. Having to watch ads while pumping gas is particularly bothersome to me. I would appreciate less adverts at gas stations for a less distracting, peaceful experience.`
+
+
 Variation: nvc
-Aggregate score: 0.3843
+Aggregate score: 0.2149
 Negativity score: 0.0001
 Sentiment: 0.4234
 Sentiment delta: 0.3297
@@ -159,7 +159,7 @@ Variant text: `I feel overwhelmed by the amount of advertising in our environmen
 
 
 Variation: hybrid
-Aggregate score: 0.2656
+Aggregate score: 0.1895
 Negativity score: 0.0001
 Sentiment: 0.1902
 Sentiment delta: 0.0965
@@ -168,7 +168,7 @@ Variant text: `We live in an advertising-heavy environment now. Having to watch 
 
 
 Variation: identity
-Aggregate score: 0.1348
+Aggregate score: 0.0974
 Negativity score: 0.2530
 Sentiment: 0.0937
 Sentiment delta: 0.0000
