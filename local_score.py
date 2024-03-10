@@ -36,19 +36,23 @@ variations = {
     "constructive": "The prevalence of advertising in our environment can feel overwhelming at times. Having to watch ads while pumping gas is particularly bothersome to me. I would appreciate less adverts at gas stations for a less distracting, peaceful experience.",
     "hybrid": "We live in an advertising-heavy environment now. Having to watch an advertisement at the gas station while pumping gas is quite bothersome. I'll avoid using those pumps when possible going forward.",
     "beta": "We live in an advertising-heavy landscape now. The biggest frustration is being forced to watch an advertisement at the gas station as I pump my gas. I'll never voluntarily use those pumps ever again.",
-    "identity":"We live in an advertising hellscape now. The biggest crock of crap is being forced to watch an advertisement at the freaking gas station as I pump my gas. I'll never voluntarily use those pumps ever again."
+    "identity":"We live in an advertising hellscape now. The biggest crock of crap is being forced to watch an advertisement at the freaking gas station as I pump my gas. I'll never voluntarily use those pumps ever again.",
+    "calm":"We live in an advertising-heavy landscape now. The biggest frustration is being forced to watch an advertisement at the gas station as I pump my gas. I'll never voluntarily use those pumps. Let's enjoy calm!"
 }
 
 # Identify replacements using difflib for 'worst_fix' variation
-matcher = difflib.SequenceMatcher(None, original_text.split(), variations['worst_fix'].split())
-replacements = {}
-for opcode in matcher.get_opcodes():
-    if opcode[0] == 'replace':
-        original_phrase = ' '.join(original_text.split()[opcode[1]:opcode[2]])
-        new_phrase = ' '.join(variations['worst_fix'].split()[opcode[3]:opcode[4]])
-        replacements[original_phrase] = new_phrase
 
-print("Replacements found:", replacements)
+def identify_replacements(original_text, this_variant):
+    matcher = difflib.SequenceMatcher(None, original_text.split(), this_variant.split())
+    replacements = {}
+    for opcode in matcher.get_opcodes():
+        if opcode[0] == 'replace':
+            original_phrase = ' '.join(original_text.split()[opcode[1]:opcode[2]])
+            new_phrase = ' '.join(this_variant.split()[opcode[3]:opcode[4]])
+            replacements[original_phrase] = new_phrase
+    return replacements
+
+print("Replacements found:", identify_replacements(original_text, variations['worst_fix']))
 
 # Function to calculate an aggregate score for each variant
 def calculate_aggregate_score(overall_similarity, negativity_score, sentiment_delta, edit_distance, max_length, name, sentiment):
@@ -93,6 +97,8 @@ for name, text in variations.items():
 
     # Calculate and store the aggregate score
     edit_distance = nltk.edit_distance(original_text, text)
+    
+    replacments = identify_replacements(original_text, text)
     aggregate_score = calculate_aggregate_score(overall_similarity, negativity_score, sentiment_delta, edit_distance, max_length,name=name, sentiment=variant_sentiment)
     variant_scores[name] = {
         "overall_similarity": overall_similarity,
@@ -102,7 +108,8 @@ for name, text in variations.items():
         "edit_distance": edit_distance,
         "max_length": max_length,
         "aggregate_score": aggregate_score,
-        "variant_text": text
+        "variant_text": text,
+        "replacements": replacments
     }
 
 # Sort the variants by aggregate score
@@ -116,11 +123,23 @@ for name, score in sorted_variants:
     print(f"Sentiment delta: {variant_scores[name]['sentiment_delta']:.4f}")
     print(f"Edit distance: {variant_scores[name]['edit_distance']}")
     print(f"Variant text: `{variant_scores[name]['variant_text']}`\n")
+    print(f"Replacements: `{variant_scores[name]['replacements']}`\n")
 
 """
 Example output:
 
 Replacements found: {'advertising hellscape': 'advertising-heavy environment', 'biggest crock of crap': 'most bothersome thing', 'never voluntarily use': 'avoid using', 'ever again.': 'in the future.'}
+
+Variation: calm
+Aggregate score: 0.6768
+Negativity score: 0.0001
+Sentiment: 0.3878
+Sentiment delta: 0.2941
+Edit distance: 44
+Variant text: `We live in an advertising-heavy landscape now. The biggest frustration is being forced to watch an advertisement at the gas station as I pump my gas. I'll never voluntarily use those pumps. Let's enjoy calm!`
+
+Replacements: `{'advertising hellscape': 'advertising-heavy landscape', 'crock of crap': 'frustration', 'pumps ever again.': "pumps. Let's enjoy calm!"}`
+
 
 Variation: beta
 Aggregate score: 0.6218
@@ -129,6 +148,8 @@ Sentiment: 0.1366
 Sentiment delta: 0.0428
 Edit distance: 29
 Variant text: `We live in an advertising-heavy landscape now. The biggest frustration is being forced to watch an advertisement at the gas station as I pump my gas. I'll never voluntarily use those pumps ever again.`
+
+Replacements: `{'advertising hellscape': 'advertising-heavy landscape', 'crock of crap': 'frustration'}`
 
 
 Variation: worst_fix
@@ -139,6 +160,8 @@ Sentiment delta: 0.0174
 Edit distance: 72
 Variant text: `We live in an advertising-heavy environment now. The most bothersome thing is being forced to watch an advertisement at the gas station as I pump my gas. I'll avoid using those pumps in the future.`
 
+Replacements: `{'advertising hellscape': 'advertising-heavy environment', 'biggest crock of crap': 'most bothersome thing', 'never voluntarily use': 'avoid using', 'ever again.': 'in the future.'}`
+
 
 Variation: constructive
 Aggregate score: 0.2612
@@ -147,6 +170,8 @@ Sentiment: 0.6391
 Sentiment delta: 0.5454
 Edit distance: 174
 Variant text: `The prevalence of advertising in our environment can feel overwhelming at times. Having to watch ads while pumping gas is particularly bothersome to me. I would appreciate less adverts at gas stations for a less distracting, peaceful experience.`
+
+Replacements: `{'We live': 'The prevalence of advertising', 'an advertising hellscape now. The biggest crock of crap is being forced': 'our environment can feel overwhelming at times. Having', 'an advertisement': 'ads while pumping gas is particularly bothersome to me. I would appreciate less adverts', "station as I pump my gas. I'll never voluntarily use those pumps ever again.": 'stations for a less distracting, peaceful experience.'}`
 
 
 Variation: nvc
@@ -157,6 +182,8 @@ Sentiment delta: 0.3297
 Edit distance: 142
 Variant text: `I feel overwhelmed by the amount of advertising in our environment now. It bothers me to have to watch an advertisement while pumping gas at the gas station. I prefer to use pumps without advertisements going forward.`
 
+Replacements: `{'We live': 'I feel overwhelmed by the amount of advertising', 'an advertising hellscape': 'our environment', 'The biggest crock of crap is being forced': 'It bothers me to have', 'station as': 'station.', "pump my gas. I'll never voluntarily": 'prefer to', 'ever again.': 'without advertisements going forward.'}`
+
 
 Variation: hybrid
 Aggregate score: 0.1895
@@ -166,6 +193,8 @@ Sentiment delta: 0.0965
 Edit distance: 112
 Variant text: `We live in an advertising-heavy environment now. Having to watch an advertisement at the gas station while pumping gas is quite bothersome. I'll avoid using those pumps when possible going forward.`
 
+Replacements: `{'advertising hellscape': 'advertising-heavy environment', 'The biggest crock of crap is being forced': 'Having', 'as I pump my gas.': 'while pumping gas is quite bothersome.', 'never voluntarily use': 'avoid using', 'ever again.': 'when possible going forward.'}`
+
 
 Variation: identity
 Aggregate score: 0.0974
@@ -174,4 +203,5 @@ Sentiment: 0.0937
 Sentiment delta: 0.0000
 Edit distance: 0
 Variant text: `We live in an advertising hellscape now. The biggest crock of crap is being forced to watch an advertisement at the freaking gas station as I pump my gas. I'll never voluntarily use those pumps ever again.`
-"""
+
+Replacements: `{}`"""
